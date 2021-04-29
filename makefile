@@ -8,10 +8,13 @@ INCLUDE_PATHS = -IC:/MinGW/sdl_libs/include/SDL2
 LIBRARY_PATHS = -LC:/MinGW/sdl_libs/lib
 
 # points to local include folder
-LOCAL_INCLUDE_PATH = ../include
+LOCAL_INCLUDE_PATH = include
+
+# points to source code folder
+SRC_PATH = src
 
 # points to objects folder
-OBJ_PATH = obj
+OBJ_PATH = $(SRC_PATH)/obj
 
 #LINKER_FLAGS specifies the libraries we're linking against
 LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2
@@ -36,9 +39,16 @@ OBJS = $(patsubst %,$(OBJ_PATH)/%,$(_OBJS))
 
 # how to compile object files
 # ensures there is an obj folder
-$(OBJ_PATH)/%.o: %.cpp $(DEPS)
-	mkdir -p obj; $(CC) -c -o $@ $< $(COMPILATION_ARGS)
+$(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp $(DEPS)
+	mkdir -p $(OBJ_PATH); $(CC) -c -o $@ $< $(COMPILATION_ARGS)
 
 #This is the target that compiles our executable
 drunk-run : $(OBJS)
-	$(CC) $(OBJS) $(COMPILATION_ARGS) $(LINKER_FLAGS) -o ../$@
+	$(CC) $(OBJS) $(COMPILATION_ARGS) $(LINKER_FLAGS) -o $@
+
+##################################################################################
+
+.PHONY: clean
+
+clean:
+	rm -f -r $(OBJ_PATH)
