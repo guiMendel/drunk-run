@@ -42,7 +42,7 @@ private:
   std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> window;
 
   // Texture renderer for the window
-  SDL_Renderer* windowRenderer{ NULL };
+  SDL_Renderer* renderer{ NULL };
 
   // Defines if the main game loop is ongoing
   bool gameActive{ false };

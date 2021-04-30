@@ -54,27 +54,35 @@ void SDLWrapper::startGame() {
       }
     }
 
-    drawShapes(windowRenderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+    drawShapes(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
 }
 
 void SDLWrapper::openWindow() {
-  // Create window
-  auto windowPtr = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+  // Aux local pointers
+  SDL_Window* windowPtr;
+  SDL_Renderer* rendererPtr;
 
-  window.reset(windowPtr);
-
-  // Ensure window was created
-  ensure((bool)window, "Failed to create window");
-
-  // Get window rederer
+  // Create window & renderer
   ensure(
-    windowRenderer = SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED),
-    "Failed to get window renderer"
+    SDL_CreateWindowAndRenderer(
+      SCREEN_WIDTH,
+      SCREEN_HEIGHT,
+      SDL_WINDOW_SHOWN,
+      &windowPtr,
+      &rendererPtr
+    ) == 0,
+    "Failed to create window"
   );
 
+  // auto windowPtr = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+
+  window.reset(windowPtr);
+  // renderer.reset(rendererPtr);
+  renderer = rendererPtr;
+
   //Initialize renderer color
-  SDL_SetRenderDrawColor(windowRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 }
 
 void test() {
