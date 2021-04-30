@@ -13,7 +13,6 @@ void test();
 // Wrapper for SDL
 class SDLWrapper {
 public:
-
   SDLWrapper() {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -22,6 +21,9 @@ public:
   }
 
   ~SDLWrapper() {
+    // Destroy img
+    if (welcomeImg) SDL_FreeSurface(welcomeImg);
+
     // Destroy window
     if (window != NULL) SDL_DestroyWindow(window);
 
@@ -32,26 +34,37 @@ public:
   // Opens window and starts main game loop
   void startGame();
 
-  void fillWhite() {
-    // Fill the surface white
-    SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+  // Fill the surface white
+  void loadImg() {
+    welcomeImg = SDL_LoadBMP("hello_world.bmp");
+
+    // Ensure image loaded
+    if (!welcomeImg) {
+      throw std::runtime_error((std::string)"SDL could not load img! SDL_Error: " + SDL_GetError());
+    }
+
+    // Print image
+    SDL_BlitSurface(welcomeImg, NULL, screenSurface, NULL);
 
     // Update the surface
     SDL_UpdateWindowSurface(window);
   }
 
 private:
-  // Opens thw window
+  // Opens the window
   void openWindow();
 
   // The window we'll be rendering to
-  SDL_Window* window {NULL};
+  SDL_Window* window{ NULL };
 
   // The surface contained by the window
-  SDL_Surface* screenSurface {NULL};
+  SDL_Surface* screenSurface{ NULL };
+
+  // Welcome image
+  SDL_Surface* welcomeImg{ NULL };
 
   // Defines if the main game loop is ongoing
-  bool gameLoop {false};
+  bool gameLoop{ false };
 };
 
 #endif

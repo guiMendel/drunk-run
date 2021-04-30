@@ -15,7 +15,7 @@ void SDLWrapper::startGame() {
   SDL_Event event;
 
   // Puts something on screen
-  fillWhite();
+  loadImg();
 
   // Initialize game loop
   while (gameLoop) {
