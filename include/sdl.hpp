@@ -26,7 +26,7 @@ public:
   // We should switch to unique_ptr for these things ASAP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ~SDLWrapper() {
     // Destroy img
-    if (welcomeImg) SDL_FreeSurface(welcomeImg);
+    if (imageBuffer) SDL_FreeSurface(imageBuffer);
 
     // Quit SDL subsystems
     SDL_Quit();
@@ -45,14 +45,17 @@ private:
   // The window we'll be rendering to
   std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> window;
 
+  // Texture renderer for the window
+  SDL_Renderer* windowRenderer{ NULL };
+
   // The surface contained by the window
   SDL_Surface* screenSurface{ NULL };
 
-  // Welcome image
-  SDL_Surface* welcomeImg{ NULL };
+  // Image buffer
+  SDL_Surface* imageBuffer{ NULL };
 
   // Defines if the main game loop is ongoing
-  bool gameLoop{ false };
+  bool gameActive{ false };
 };
 
 #endif
