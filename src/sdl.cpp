@@ -16,7 +16,7 @@ void SDLWrapper::startGame() {
   SDL_Event event;
 
   // Puts something on screen
-  loadImg();
+  loadImg("hello_world.bmp");
 
   // Initialize game loop
   while (gameLoop) {
@@ -32,7 +32,6 @@ void SDLWrapper::startGame() {
 
 void SDLWrapper::openWindow() {
   // Create window
-  // window = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
   auto windowPtr = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
   window.reset(windowPtr);
@@ -44,6 +43,21 @@ void SDLWrapper::openWindow() {
 
   // Get window surface
   screenSurface = SDL_GetWindowSurface(window.get());
+}
+
+void SDLWrapper::loadImg(std::string path) {
+  welcomeImg = SDL_LoadBMP(path.c_str());
+
+  // Ensure image loaded
+  if (!welcomeImg) {
+    throw std::runtime_error((std::string)"SDL could not load img! SDL_Error: " + SDL_GetError());
+  }
+
+  // Print image
+  SDL_BlitSurface(welcomeImg, NULL, screenSurface, NULL);
+
+  // Update the surface
+  SDL_UpdateWindowSurface(window.get());
 }
 
 void test() {

@@ -14,7 +14,7 @@ void test();
 // Wrapper for SDL
 class SDLWrapper {
 public:
-  // Initialize unique_ptr deleters
+  // Initialize unique_ptr deleter
   SDLWrapper() : window(nullptr, SDL_DestroyWindow) {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -34,21 +34,8 @@ public:
   // Opens window and starts main game loop
   void startGame();
 
-  // Fill the surface white
-  void loadImg() {
-    welcomeImg = SDL_LoadBMP("hello_world.bmp");
-
-    // Ensure image loaded
-    if (!welcomeImg) {
-      throw std::runtime_error((std::string)"SDL could not load img! SDL_Error: " + SDL_GetError());
-    }
-
-    // Print image
-    SDL_BlitSurface(welcomeImg, NULL, screenSurface, NULL);
-
-    // Update the surface
-    SDL_UpdateWindowSurface(window.get());
-  }
+  // Loads an image (wont be in final product, only here for testing)
+  void loadImg(std::string path);
 
 private:
   // Opens the window
