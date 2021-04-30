@@ -6,14 +6,15 @@
 #include <string>
 #include <stdexcept>
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
-
 void test();
 
 // Wrapper for SDL
 class SDLWrapper {
 public:
+  // Public constants
+  static const int SCREEN_WIDTH = 800;
+  static const int SCREEN_HEIGHT = 600;
+
   // Initialize unique_ptr deleter
   SDLWrapper() : window(nullptr, SDL_DestroyWindow) {
     // Initialize SDL

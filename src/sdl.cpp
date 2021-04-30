@@ -62,14 +62,23 @@ void SDLWrapper::loadImg(std::string path) {
     "Failed to load image"
   );
 
-  // Convert image
+  // Optimize image
   ensure(
     welcomeImg = SDL_ConvertSurface(loadedSurface, screenSurface->format, 0),
     "Invalid image"
   );
 
-  // Print image
-  SDL_BlitSurface(welcomeImg, NULL, screenSurface, NULL);
+  // Get rid of temp surface
+  SDL_FreeSurface(loadedSurface);
+
+  // Stretch image
+  SDL_Rect stretchRect;
+  stretchRect.x = 0;
+  stretchRect.y = 0;
+  stretchRect.w = SCREEN_WIDTH;
+  stretchRect.h = SCREEN_HEIGHT;
+
+  SDL_BlitScaled(welcomeImg, NULL, screenSurface, &stretchRect);
 
   // Update the surface
   SDL_UpdateWindowSurface(window.get());
