@@ -6,17 +6,15 @@
 #include <string>
 #include <stdexcept>
 
-void test();
-
 // Wrapper for SDL
 class SDLWrapper {
 public:
-  // Public constants
-  static const int SCREEN_WIDTH = 800;
-  static const int SCREEN_HEIGHT = 600;
-
   // Initialize window's & renderer's unique_ptr deleter
-  SDLWrapper() : window(nullptr, SDL_DestroyWindow), renderer(nullptr, SDL_DestroyRenderer) {
+  SDLWrapper(int width, int height) :
+    screenWidth(width),
+    screenHeight(height),
+    window(nullptr, SDL_DestroyWindow),
+    renderer(nullptr, SDL_DestroyRenderer) {
     // Initialize SDL
     ensure(SDL_Init(SDL_INIT_VIDEO) >= 0, "Failed to initialize SDL");
   }
@@ -26,26 +24,31 @@ public:
     SDL_Quit();
   }
 
-  // Opens window and starts main game loop
-  void startGame();
+  // Opens the window
+  void openWindow();
+
+  // Handles current event queue with provided function. Accepts a context to resolve methods.
+  void resolveEvents(void(*eventHandler)(void*, SDL_Event&), void*);
+
+  // Draw some random shapes (MEANT FOR TESTING)
+  void drawShapes();
 
   // If first parameter isn't truthy, throws error with provided message and SDL error log
   static void ensure(bool success, std::string errorMessage) {
-    if (!success) throw std::runtime_error(errorMessage + "\n==> SDL error: " + SDL_GetError());
+    if (!success)
+      throw std::runtime_error(errorMessage + "\n==> SDL error: " + SDL_GetError());
   }
 
 private:
-  // Opens the window
-  void openWindow();
+  // Window dimensions
+  int screenWidth;
+  int screenHeight;
 
   // The window we'll be rendering to
   std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> window;
 
   // Renderer for the window
   std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> renderer;
-
-  // Defines if the main game loop is ongoing
-  bool gameActive{ false };
 };
 
 #endif

@@ -1,6 +1,9 @@
-#include "../include/sdl.hpp"
+#include "../include/game.hpp"
 
 int main(int argc, char* args[]) {
-  test();
+  Game game;
+
+  game.startGame();
+  
   return 0;
 }

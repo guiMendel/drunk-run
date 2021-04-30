@@ -25,11 +25,11 @@ COMPILATION_ARGS = $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS)
 ##################################################################################
 
 #DEPS header files
-_DEPS = sdl.hpp
+_DEPS = sdl.hpp game.hpp
 DEPS = $(patsubst %,$(LOCAL_INCLUDE_PATH)/%,$(_DEPS))
 
 #OBJS specifies which files to compile as part of the project
-_OBJS = main.o sdl.o
+_OBJS = main.o sdl.o game.o
 OBJS = $(patsubst %,$(OBJ_PATH)/%,$(_OBJS))
 
 ##################################################################################

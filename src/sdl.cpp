@@ -1,60 +1,46 @@
 #include <SDL.h>
-#include <stdio.h>
-#include <stdexcept>
-#include <memory>
-#include <string>
 #include "../include/sdl.hpp"
 
-static void drawShapes(SDL_Renderer* renderer, int screenWidth, int screenHeight) {
+void SDLWrapper::drawShapes() {
+  // Get renderer pointer
+  auto rendererPtr = renderer.get();
+
   // Clear screen
-  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-  SDL_RenderClear(renderer);
+  SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0xFF, 0xFF, 0xFF);
+  SDL_RenderClear(rendererPtr);
 
   // Render red filled quad
   SDL_Rect fillRect = { screenWidth / 4, screenHeight / 4, screenWidth / 2, screenHeight / 2 };
-  SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-  SDL_RenderFillRect(renderer, &fillRect);
+  SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0x00, 0x00, 0xFF);
+  SDL_RenderFillRect(rendererPtr, &fillRect);
 
   //Render green outlined quad
   SDL_Rect outlineRect = { screenWidth / 6, screenHeight / 6, screenWidth * 2 / 3, screenHeight * 2 / 3 };
-  SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF);
-  SDL_RenderDrawRect(renderer, &outlineRect);
+  SDL_SetRenderDrawColor(rendererPtr, 0x00, 0xFF, 0x00, 0xFF);
+  SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
   //Draw blue horizontal line
-  SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xFF, 0xFF);
-  SDL_RenderDrawLine(renderer, 0, screenHeight / 2, screenWidth, screenHeight / 2);
+  SDL_SetRenderDrawColor(rendererPtr, 0x00, 0x00, 0xFF, 0xFF);
+  SDL_RenderDrawLine(rendererPtr, 0, screenHeight / 2, screenWidth, screenHeight / 2);
 
   //Draw vertical line of yellow dots
-  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0x00, 0xFF);
+  SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0xFF, 0x00, 0xFF);
   for (int i = 0; i < screenHeight; i += 4) {
-    SDL_RenderDrawPoint(renderer, screenWidth / 2, i);
+    SDL_RenderDrawPoint(rendererPtr, screenWidth / 2, i);
   }
 
   //Update screen
-  SDL_RenderPresent(renderer);
+  SDL_RenderPresent(rendererPtr);
 }
 
-void SDLWrapper::startGame() {
-  // Open window
-  openWindow();
 
-  // Set game loop to true
-  gameActive = true;
+void SDLWrapper::resolveEvents(void(*eventHandler)(void*, SDL_Event&), void *context) {
+  // Input event receiver
+  static SDL_Event event;
 
-  // Input event handler
-  SDL_Event event;
-
-  // Initialize game loop
-  while (gameActive) {
-    // Handle events on queue
-    while (SDL_PollEvent(&event) != 0) {
-      // User requests quit
-      if (event.type == SDL_QUIT) {
-        gameActive = false;
-      }
-    }
-
-    drawShapes(renderer.get(), SCREEN_WIDTH, SCREEN_HEIGHT);
+  // Handle events on queue
+  while (SDL_PollEvent(&event) != 0) {
+    eventHandler(context, event);
   }
 }
 
@@ -66,13 +52,16 @@ void SDLWrapper::openWindow() {
   // Create window & renderer
   ensure(
     SDL_CreateWindowAndRenderer(
-      SCREEN_WIDTH,
-      SCREEN_HEIGHT,
+      // Window width & height
+      screenWidth,
+      screenHeight,
+      // Window flags
       SDL_WINDOW_SHOWN,
+      // Pointer refs
       &windowPtr,
       &rendererPtr
     ) == 0,
-    "Failed to create window"
+    "Failed to create window and renderer"
   );
 
   // Store pointers
@@ -81,10 +70,4 @@ void SDLWrapper::openWindow() {
 
   //Initialize renderer color
   SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
-}
-
-void test() {
-  SDLWrapper sdl;
-
-  sdl.startGame();
 }
