@@ -48,4 +48,4 @@ drunk-run : $(OBJS)
 .PHONY: clean
 
 clean:
-	rm -f -r $(OBJ_PATH)
+	rm -f -r $(OBJ_PATH); rm drunk-run.exe

@@ -1,55 +1,32 @@
 #include <SDL.h>
 #include <stdio.h>
+#include <stdexcept>
+#include <string>
+#include "../include/sdl.hpp"
 
-// Screen dimension constants
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
-
-void shutDown(SDL_Window* window) {
-  // Destroy window
-  SDL_DestroyWindow(window);
-
-  // Quit SDL subsystems
-  SDL_Quit();
-}
-
-void test() {
-  // The window we'll be rendering to
-  SDL_Window* window = NULL;
-
-  // The surface contained by the window
-  SDL_Surface* screenSurface = NULL;
-
+SDLWrapper::SDLWrapper() {
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-    shutDown(window);
-
-    return;
+    throw std::runtime_error((std::string)"SDL could not initialize! SDL_Error: " + SDL_GetError());
   }
 
   // Create window
-  window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+  window = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
   // Ensure window was created
   if (window == NULL) {
-    printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-    shutDown(window);
-
-    return;
+    throw std::runtime_error((std::string)"Window could not be created! SDL_Error: " + SDL_GetError());
   }
 
   // Get window surface
   screenSurface = SDL_GetWindowSurface(window);
+}
 
-  // Fill the surface white
-  SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+void test() {
+  SDLWrapper sdl;
 
-  // Update the surface
-  SDL_UpdateWindowSurface(window);
+  sdl.fillWhite();
 
   // Wait two seconds
   SDL_Delay(2000);
-
-  shutDown(window);
 }
