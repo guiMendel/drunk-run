@@ -5,6 +5,16 @@
 #include <string>
 #include "../include/sdl.hpp"
 
+// Wraps throwing a runtime error with SDL error concatenated to msg
+void throwError(std::string message) {
+  throw std::runtime_error(message + "\n==> SDL error: " + SDL_GetError());
+}
+
+// If first parameter isn't truthy, throws error with provided message
+void ensure(bool success, std::string errorMessage) {
+  if (!success) throwError(errorMessage);
+}
+
 void SDLWrapper::startGame() {
   // Open window
   openWindow();
@@ -37,21 +47,26 @@ void SDLWrapper::openWindow() {
   window.reset(windowPtr);
 
   // Ensure window was created
-  if (!window) {
-    throw std::runtime_error((std::string)"Window could not be created! SDL_Error: " + SDL_GetError());
-  }
+  ensure((bool)window, "Failed to create window");
 
   // Get window surface
   screenSurface = SDL_GetWindowSurface(window.get());
 }
 
 void SDLWrapper::loadImg(std::string path) {
-  welcomeImg = SDL_LoadBMP(path.c_str());
+  SDL_Surface* loadedSurface;
 
-  // Ensure image loaded
-  if (!welcomeImg) {
-    throw std::runtime_error((std::string)"SDL could not load img! SDL_Error: " + SDL_GetError());
-  }
+  // Load image
+  ensure(
+    loadedSurface = SDL_LoadBMP(path.c_str()),
+    "Failed to load image"
+  );
+
+  // Convert image
+  ensure(
+    welcomeImg = SDL_ConvertSurface(loadedSurface, screenSurface->format, 0),
+    "Invalid image"
+  );
 
   // Print image
   SDL_BlitSurface(welcomeImg, NULL, screenSurface, NULL);

@@ -2,3 +2,4 @@
 obj
 *.o
 c_cpp_properties.json
+.vscode
