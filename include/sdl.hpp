@@ -15,19 +15,13 @@ public:
   static const int SCREEN_WIDTH = 800;
   static const int SCREEN_HEIGHT = 600;
 
-  // Initialize unique_ptr deleter
+  // Initialize window's unique_ptr deleter
   SDLWrapper() : window(nullptr, SDL_DestroyWindow) {
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-      throw std::runtime_error((std::string)"SDL could not initialize! SDL_Error: " + SDL_GetError());
-    }
+    ensure(SDL_Init(SDL_INIT_VIDEO) >= 0, "Failed to initialize SDL");
   }
 
-  // We should switch to unique_ptr for these things ASAP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ~SDLWrapper() {
-    // Destroy img
-    if (imageBuffer) SDL_FreeSurface(imageBuffer);
-
     // Quit SDL subsystems
     SDL_Quit();
   }
@@ -35,8 +29,10 @@ public:
   // Opens window and starts main game loop
   void startGame();
 
-  // Loads an image (wont be in final product, only here for testing)
-  void loadImg(std::string path);
+  // If first parameter isn't truthy, throws error with provided message and SDL error log
+  static void ensure(bool success, std::string errorMessage) {
+    if (!success) throw std::runtime_error(errorMessage + "\n==> SDL error: " + SDL_GetError());
+  }
 
 private:
   // Opens the window
@@ -47,12 +43,6 @@ private:
 
   // Texture renderer for the window
   SDL_Renderer* windowRenderer{ NULL };
-
-  // The surface contained by the window
-  SDL_Surface* screenSurface{ NULL };
-
-  // Image buffer
-  SDL_Surface* imageBuffer{ NULL };
 
   // Defines if the main game loop is ongoing
   bool gameActive{ false };
