@@ -2,6 +2,8 @@
 #define __SDLWRAPPER__
 
 #include <SDL.h>
+#include <string>
+#include <stdexcept>
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -12,7 +14,12 @@ void test();
 class SDLWrapper {
 public:
 
-  SDLWrapper();
+  SDLWrapper() {
+    // Initialize SDL
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+      throw std::runtime_error((std::string)"SDL could not initialize! SDL_Error: " + SDL_GetError());
+    }
+  }
 
   ~SDLWrapper() {
     // Destroy window
@@ -21,6 +28,9 @@ public:
     // Quit SDL subsystems
     SDL_Quit();
   }
+
+  // Opens window and starts main game loop
+  void startGame();
 
   void fillWhite() {
     // Fill the surface white
@@ -31,11 +41,17 @@ public:
   }
 
 private:
+  // Opens thw window
+  void openWindow();
+
   // The window we'll be rendering to
-  SDL_Window* window = NULL;
+  SDL_Window* window {NULL};
 
   // The surface contained by the window
-  SDL_Surface* screenSurface = NULL;
+  SDL_Surface* screenSurface {NULL};
+
+  // Defines if the main game loop is ongoing
+  bool gameLoop {false};
 };
 
 #endif

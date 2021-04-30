@@ -4,12 +4,32 @@
 #include <string>
 #include "../include/sdl.hpp"
 
-SDLWrapper::SDLWrapper() {
-  // Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    throw std::runtime_error((std::string)"SDL could not initialize! SDL_Error: " + SDL_GetError());
-  }
+void SDLWrapper::startGame() {
+  // Open window
+  openWindow();
 
+  // Set game loop to true
+  gameLoop = true;
+
+  // Input event handler
+  SDL_Event event;
+
+  // Puts something on screen
+  fillWhite();
+
+  // Initialize game loop
+  while (gameLoop) {
+    // Handle events on queue
+    while (SDL_PollEvent(&event) != 0) {
+      // User requests quit
+      if (event.type == SDL_QUIT) {
+        gameLoop = false;
+      }
+    }
+  }
+}
+
+void SDLWrapper::openWindow() {
   // Create window
   window = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
@@ -25,8 +45,5 @@ SDLWrapper::SDLWrapper() {
 void test() {
   SDLWrapper sdl;
 
-  sdl.fillWhite();
-
-  // Wait two seconds
-  SDL_Delay(2000);
+  sdl.startGame();
 }
