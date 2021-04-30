@@ -2,6 +2,7 @@
 #define __SDLWRAPPER__
 
 #include <SDL.h>
+#include <memory>
 #include <string>
 #include <stdexcept>
 
@@ -13,19 +14,18 @@ void test();
 // Wrapper for SDL
 class SDLWrapper {
 public:
-  SDLWrapper() {
+  // Initialize unique_ptr deleters
+  SDLWrapper() : window(nullptr, SDL_DestroyWindow) {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
       throw std::runtime_error((std::string)"SDL could not initialize! SDL_Error: " + SDL_GetError());
     }
   }
 
+  // We should switch to unique_ptr for these things ASAP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ~SDLWrapper() {
     // Destroy img
     if (welcomeImg) SDL_FreeSurface(welcomeImg);
-
-    // Destroy window
-    if (window != NULL) SDL_DestroyWindow(window);
 
     // Quit SDL subsystems
     SDL_Quit();
@@ -47,7 +47,7 @@ public:
     SDL_BlitSurface(welcomeImg, NULL, screenSurface, NULL);
 
     // Update the surface
-    SDL_UpdateWindowSurface(window);
+    SDL_UpdateWindowSurface(window.get());
   }
 
 private:
@@ -55,7 +55,7 @@ private:
   void openWindow();
 
   // The window we'll be rendering to
-  SDL_Window* window{ NULL };
+  std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> window;
 
   // The surface contained by the window
   SDL_Surface* screenSurface{ NULL };

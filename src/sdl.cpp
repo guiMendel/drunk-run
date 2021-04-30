@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <stdio.h>
 #include <stdexcept>
+#include <memory>
 #include <string>
 #include "../include/sdl.hpp"
 
@@ -31,15 +32,18 @@ void SDLWrapper::startGame() {
 
 void SDLWrapper::openWindow() {
   // Create window
-  window = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+  // window = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+  auto windowPtr = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+
+  window.reset(windowPtr);
 
   // Ensure window was created
-  if (window == NULL) {
+  if (!window) {
     throw std::runtime_error((std::string)"Window could not be created! SDL_Error: " + SDL_GetError());
   }
 
   // Get window surface
-  screenSurface = SDL_GetWindowSurface(window);
+  screenSurface = SDL_GetWindowSurface(window.get());
 }
 
 void test() {
