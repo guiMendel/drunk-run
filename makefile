@@ -2,10 +2,10 @@
 CC = g++
 
 #INCLUDE_PATHS specifies the additional include paths we'll need
-INCLUDE_PATHS = -IC:/MinGW/sdl_libs/include/SDL2
+INCLUDE_PATHS = $(shell sdl2-config --cflags)
 
 #LIBRARY_PATHS specifies the additional library paths we'll need
-LIBRARY_PATHS = -LC:/MinGW/sdl_libs/lib
+LIBRARY_PATHS = $(shell sdl2-config --libs) 
 
 # points to local include folder
 LOCAL_INCLUDE_PATH = include
@@ -15,9 +15,6 @@ SRC_PATH = src
 
 # points to objects folder
 OBJ_PATH = $(SRC_PATH)/obj
-
-#LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2
 
 #COMPILER_FLAGS specifies the additional compilation options we're using
 COMPILER_FLAGS = -std=c++17 -Wall -Wextra -pedantic
@@ -44,7 +41,7 @@ $(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp $(DEPS)
 
 #This is the target that compiles our executable
 drunk-run : $(OBJS)
-	$(CC) $(OBJS) $(COMPILATION_ARGS) $(LINKER_FLAGS) -o $@
+	$(CC) $(OBJS) $(COMPILATION_ARGS) -o $@
 
 ##################################################################################
 
