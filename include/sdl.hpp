@@ -15,8 +15,8 @@ public:
   static const int SCREEN_WIDTH = 800;
   static const int SCREEN_HEIGHT = 600;
 
-  // Initialize window's unique_ptr deleter
-  SDLWrapper() : window(nullptr, SDL_DestroyWindow) {
+  // Initialize window's & renderer's unique_ptr deleter
+  SDLWrapper() : window(nullptr, SDL_DestroyWindow), renderer(nullptr, SDL_DestroyRenderer) {
     // Initialize SDL
     ensure(SDL_Init(SDL_INIT_VIDEO) >= 0, "Failed to initialize SDL");
   }
@@ -41,8 +41,8 @@ private:
   // The window we'll be rendering to
   std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> window;
 
-  // Texture renderer for the window
-  SDL_Renderer* renderer{ NULL };
+  // Renderer for the window
+  std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> renderer;
 
   // Defines if the main game loop is ongoing
   bool gameActive{ false };

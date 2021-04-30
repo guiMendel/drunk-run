@@ -54,7 +54,7 @@ void SDLWrapper::startGame() {
       }
     }
 
-    drawShapes(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+    drawShapes(renderer.get(), SCREEN_WIDTH, SCREEN_HEIGHT);
   }
 }
 
@@ -75,14 +75,12 @@ void SDLWrapper::openWindow() {
     "Failed to create window"
   );
 
-  // auto windowPtr = SDL_CreateWindow("SDL Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-
+  // Store pointers
   window.reset(windowPtr);
-  // renderer.reset(rendererPtr);
-  renderer = rendererPtr;
+  renderer.reset(rendererPtr);
 
   //Initialize renderer color
-  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+  SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
 }
 
 void test() {
