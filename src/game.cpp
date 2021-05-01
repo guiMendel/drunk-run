@@ -26,6 +26,9 @@ void Game::startGame() {
     // Player walk
     playerProgress += 1;
 
-    sdl.drawShapes(playerProgress);
+    // Update camera to player position
+    sdl.setCamera(playerProgress);
+
+    sdl.drawShapes();
   }
 }

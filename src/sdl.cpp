@@ -1,20 +1,54 @@
 #include <SDL.h>
 #include "../include/sdl.hpp"
 
-void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distance) {
-  if (distance < 0) return;
+#define GROUND_Y height - (screenHeight / 2) - CAMERA_HEIGHT
 
-  SDL_Rect outlineRect = {
+SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width, int height, int distance) {
+  return SDL_Rect({
     x(perspective(bottomLeft, distance)),
     // Assume y = bottom of screen - camera height
-    y(perspective(height - (screenHeight / 2) - CAMERA_HEIGHT, distance)),
+    y(perspective(GROUND_Y, distance)),
     perspective(width, distance),
     perspective(height, distance)
-  };
-  SDL_RenderFillRect(renderer.get(), &outlineRect);
+    });
 }
 
-void SDLWrapper::drawShapes(float relativeDistance) {
+void SDLWrapper::drawEdge(int pointX, int pointY, int distance) {
+  SDL_RenderDrawLine(
+    renderer.get(),
+    x(perspective(pointX, distance)),
+    y(perspective(pointY, distance)),
+    x(perspective(pointX, distance + OBSTACLE_DEPTH)),
+    y(perspective(pointY, distance + OBSTACLE_DEPTH))
+  );
+}
+
+void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distance) {
+  // Relative distance to camera
+  distance -= cameraZ;
+
+  // Ignore obstacles beyond the camera
+  if (distance < 0) return;
+
+  // Get renderer
+  auto rendererPtr = renderer.get();
+
+  // Draw front face
+  SDL_Rect outlineRect = makeRect(bottomLeft, width, height, distance);
+  SDL_RenderDrawRect(rendererPtr, &outlineRect);
+
+  // Draw back face
+  outlineRect = makeRect(bottomLeft, width, height, distance + OBSTACLE_DEPTH);
+  SDL_RenderDrawRect(rendererPtr, &outlineRect);
+
+  // Draw edges
+  drawEdge(bottomLeft, -(screenHeight / 2) - CAMERA_HEIGHT, distance);
+  drawEdge(bottomLeft + width - 2, -(screenHeight / 2) - CAMERA_HEIGHT, distance);
+  drawEdge(bottomLeft, -(screenHeight / 2) - CAMERA_HEIGHT + height, distance);
+  drawEdge(bottomLeft + width - 2, -(screenHeight / 2) - CAMERA_HEIGHT + height, distance);
+}
+
+void SDLWrapper::drawShapes() {
   // Get renderer pointer
   auto rendererPtr = renderer.get();
 
@@ -30,10 +64,16 @@ void SDLWrapper::drawShapes(float relativeDistance) {
   // SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
   // Render rect
-  drawObstacle(-200, 400, 1200, 10000 - relativeDistance);
+  drawObstacle(-300, 300, 1200, 3000);
 
   // Render rect
-  drawObstacle(300, 300, 800, 15000 - relativeDistance);
+  drawObstacle(-350, 500, 1000, 10000);
+
+  // Render rect
+  drawObstacle(300, 200, 700, 6500);
+
+  // Render rect
+  // drawObstacle(300, 300, 800, 6000);
 
   // //Draw blue horizontal line
   // SDL_RenderDrawLine(rendererPtr, 0, screenHeight / 2, screenWidth, screenHeight / 2);

@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #define CAMERA_HEIGHT 300
+#define OBSTACLE_DEPTH 500
 
 // Wrapper for SDL
 class SDLWrapper {
@@ -36,10 +37,13 @@ public:
   // Handles current event queue with provided function. Accepts a context to resolve methods.
   void resolveEvents(void(*eventHandler)(void*, SDL_Event&), void*);
 
+  // Update camera position
+  void setCamera(float z) { cameraZ = z; }
+
   //////////////////////// GEOMETRY
 
   // Draw some random shapes (MEANT FOR TESTING)
-  void drawShapes(float relativeDistance);
+  void drawShapes();
 
   // Draws a rectangle relative to it's distance from screen
   void drawObstacle(int bottomLeft, int width, int height, int distance);
@@ -62,6 +66,12 @@ public:
   }
 
 private:
+  // Make an SDL Rect with y fixed on the ground and applying perspective
+  SDL_Rect makeRect(int bottomLeft, int width, int height, int distance);
+
+  // Draw a line from a point to it's corresponding depth
+  void drawEdge(int pointX, int pointY, int distance);
+
   // Simulated distance from eye to screen
   float eyeDistance;
 
@@ -74,6 +84,9 @@ private:
 
   // Renderer for the window
   std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> renderer;
+
+  // Camera z position
+  float cameraZ{ 0.0 };
 };
 
 #endif
