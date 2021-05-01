@@ -24,7 +24,7 @@ void Game::startGame() {
     handleUserInput();
 
     // Player walk
-    playerProgress += 1;
+    playerProgress += (playerMoveSpeed * sdl.elapsedTime()) / 1000.0;
 
     // Update camera to player position
     sdl.setCamera(playerProgress);

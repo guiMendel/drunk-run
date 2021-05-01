@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 #include <stdexcept>
+#include <cstdint>
+#include <iostream>
 
 #define CAMERA_HEIGHT 300
 #define OBSTACLE_DEPTH 500
@@ -59,6 +61,14 @@ public:
 
   //////////////////////// HELPERS
 
+  // Returns amount of miliseconds elapsed from last call to this same method
+  // First call is relative to object construction
+  Uint32 elapsedTime() {
+    auto lastStick = timeStick;
+    timeStick = SDL_GetTicks();
+    return timeStick - lastStick;
+  }
+
   // If first parameter isn't truthy, throws error with provided message and SDL error log
   static void ensure(bool success, std::string errorMessage) {
     if (!success)
@@ -71,6 +81,9 @@ private:
 
   // Draw a line from a point to it's corresponding depth
   void drawEdge(int pointX, int pointY, int distance);
+
+  // Keeps track of the last time the elapsedTime method was called
+  Uint32 timeStick{ 0 };
 
   // Simulated distance from eye to screen
   float eyeDistance;

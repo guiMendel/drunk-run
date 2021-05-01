@@ -64,10 +64,13 @@ void SDLWrapper::drawShapes() {
   // SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
   // Render rect
-  drawObstacle(-300, 300, 1200, 3000);
+  drawObstacle(-400, 300, 1200, 3000);
 
   // Render rect
   drawObstacle(-350, 500, 1000, 10000);
+
+  // Render rect
+  drawObstacle(-50, 100, 200, 4800);
 
   // Render rect
   drawObstacle(300, 200, 700, 6500);
