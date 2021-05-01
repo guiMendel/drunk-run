@@ -1,7 +1,20 @@
 #include <SDL.h>
 #include "../include/sdl.hpp"
 
-void SDLWrapper::drawShapes() {
+void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distance) {
+  if (distance < 0) return;
+
+  SDL_Rect outlineRect = {
+    x(perspective(bottomLeft, distance)),
+    // Assume y = bottom of screen - camera height
+    y(perspective(height - (screenHeight / 2) - CAMERA_HEIGHT, distance)),
+    perspective(width, distance),
+    perspective(height, distance)
+  };
+  SDL_RenderFillRect(renderer.get(), &outlineRect);
+}
+
+void SDLWrapper::drawShapes(float relativeDistance) {
   // Get renderer pointer
   auto rendererPtr = renderer.get();
 
@@ -9,32 +22,31 @@ void SDLWrapper::drawShapes() {
   SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0xFF, 0xFF, 0xFF);
   SDL_RenderClear(rendererPtr);
 
-  // Render red filled quad
-  SDL_Rect fillRect = { screenWidth / 4, screenHeight / 4, screenWidth / 2, screenHeight / 2 };
-  SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0x00, 0x00, 0xFF);
-  SDL_RenderFillRect(rendererPtr, &fillRect);
+  // Paint black
+  SDL_SetRenderDrawColor(rendererPtr, 0x00, 0x00, 0x00, 0xFF);
 
-  //Render green outlined quad
-  SDL_Rect outlineRect = { screenWidth / 6, screenHeight / 6, screenWidth * 2 / 3, screenHeight * 2 / 3 };
-  SDL_SetRenderDrawColor(rendererPtr, 0x00, 0xFF, 0x00, 0xFF);
-  SDL_RenderDrawRect(rendererPtr, &outlineRect);
+  // //Render outlined quad
+  // SDL_Rect outlineRect = { x(-200), y(200), 400, 400 };
+  // SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
-  //Draw blue horizontal line
-  SDL_SetRenderDrawColor(rendererPtr, 0x00, 0x00, 0xFF, 0xFF);
-  SDL_RenderDrawLine(rendererPtr, 0, screenHeight / 2, screenWidth, screenHeight / 2);
+  // Render rect
+  drawObstacle(-200, 400, 1200, 10000 - relativeDistance);
 
-  //Draw vertical line of yellow dots
-  SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0xFF, 0x00, 0xFF);
-  for (int i = 0; i < screenHeight; i += 4) {
-    SDL_RenderDrawPoint(rendererPtr, screenWidth / 2, i);
-  }
+  // Render rect
+  drawObstacle(300, 300, 800, 15000 - relativeDistance);
+
+  // //Draw blue horizontal line
+  // SDL_RenderDrawLine(rendererPtr, 0, screenHeight / 2, screenWidth, screenHeight / 2);
+
+  // // Draw dot
+  // SDL_RenderDrawPoint(rendererPtr, x(0), y(100));
 
   //Update screen
   SDL_RenderPresent(rendererPtr);
 }
 
 
-void SDLWrapper::resolveEvents(void(*eventHandler)(void*, SDL_Event&), void *context) {
+void SDLWrapper::resolveEvents(void(*eventHandler)(void*, SDL_Event&), void* context) {
   // Input event receiver
   static SDL_Event event;
 

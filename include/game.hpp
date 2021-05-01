@@ -30,6 +30,9 @@ private:
 
   // Defines if the main game loop is ongoing
   bool gameActive{ false };
+
+  // Amount of units the player has advanced
+  float playerProgress{ 0.0 };
 };
 
 #endif

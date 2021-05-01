@@ -6,6 +6,8 @@
 #include <string>
 #include <stdexcept>
 
+#define CAMERA_HEIGHT 300
+
 // Wrapper for SDL
 class SDLWrapper {
 public:
@@ -17,6 +19,8 @@ public:
     renderer(nullptr, SDL_DestroyRenderer) {
     // Initialize SDL
     ensure(SDL_Init(SDL_INIT_VIDEO) >= 0, "Failed to initialize SDL");
+    // Calculate eye distance using tan(30) & screen width
+    eyeDistance = (screenWidth / 2.0) / 0.57735026919;
   }
 
   ~SDLWrapper() {
@@ -24,14 +28,32 @@ public:
     SDL_Quit();
   }
 
+  //////////////////////// WINDOW
+
   // Opens the window
   void openWindow();
 
   // Handles current event queue with provided function. Accepts a context to resolve methods.
   void resolveEvents(void(*eventHandler)(void*, SDL_Event&), void*);
 
+  //////////////////////// GEOMETRY
+
   // Draw some random shapes (MEANT FOR TESTING)
-  void drawShapes();
+  void drawShapes(float relativeDistance);
+
+  // Draws a rectangle relative to it's distance from screen
+  void drawObstacle(int bottomLeft, int width, int height, int distance);
+
+  // Applies perspective to a point
+  int perspective(int point, int distance) { return point * eyeDistance / (eyeDistance + distance); }
+
+  // Converts horizontal positioning from SDL to window-centered
+  int x(int value) { return screenWidth / 2 + value; }
+
+  // Converts vertical positioning from SDL to window-centered
+  int y(int value) { return screenHeight / 2 - value; }
+
+  //////////////////////// HELPERS
 
   // If first parameter isn't truthy, throws error with provided message and SDL error log
   static void ensure(bool success, std::string errorMessage) {
@@ -40,6 +62,9 @@ public:
   }
 
 private:
+  // Simulated distance from eye to screen
+  float eyeDistance;
+
   // Window dimensions
   int screenWidth;
   int screenHeight;

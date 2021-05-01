@@ -23,6 +23,9 @@ void Game::startGame() {
   while (gameActive) {
     handleUserInput();
 
-    sdl.drawShapes();
+    // Player walk
+    playerProgress += 1;
+
+    sdl.drawShapes(playerProgress);
   }
 }
