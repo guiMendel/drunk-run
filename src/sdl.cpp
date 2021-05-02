@@ -64,8 +64,8 @@ void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distanc
   SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
   // Draw edges
-  drawEdge(bottomLeft, -(screenHeight / 2), distance);
-  drawEdge(bottomLeft + width - 2, -(screenHeight / 2), distance);
+  drawEdge(bottomLeft, -(screenHeight / 2) + 5, distance);
+  drawEdge(bottomLeft + width - 2, -(screenHeight / 2) + 5, distance);
   drawEdge(bottomLeft, -(screenHeight / 2) + height, distance);
   drawEdge(bottomLeft + width - 2, -(screenHeight / 2) + height, distance);
 }
