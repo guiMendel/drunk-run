@@ -17,9 +17,9 @@ void SDLWrapper::drawEdge(int pointX, int pointY, int distance) {
   SDL_RenderDrawLine(
     renderer.get(),
     x(perspective(pointX, distance)),
-    y(perspective(pointY, distance)),
+    y(perspective(pointY - CAMERA_HEIGHT, distance)),
     x(perspective(pointX, distance + OBSTACLE_DEPTH)),
-    y(perspective(pointY, distance + OBSTACLE_DEPTH))
+    y(perspective(pointY - CAMERA_HEIGHT, distance + OBSTACLE_DEPTH))
   );
 }
 
@@ -42,10 +42,10 @@ void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distanc
   SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
   // Draw edges
-  drawEdge(bottomLeft, -(screenHeight / 2) - CAMERA_HEIGHT, distance);
-  drawEdge(bottomLeft + width - 2, -(screenHeight / 2) - CAMERA_HEIGHT, distance);
-  drawEdge(bottomLeft, -(screenHeight / 2) - CAMERA_HEIGHT + height, distance);
-  drawEdge(bottomLeft + width - 2, -(screenHeight / 2) - CAMERA_HEIGHT + height, distance);
+  drawEdge(bottomLeft, -(screenHeight / 2), distance);
+  drawEdge(bottomLeft + width - 2, -(screenHeight / 2), distance);
+  drawEdge(bottomLeft, -(screenHeight / 2) + height, distance);
+  drawEdge(bottomLeft + width - 2, -(screenHeight / 2) + height, distance);
 }
 
 void SDLWrapper::drawShapes() {

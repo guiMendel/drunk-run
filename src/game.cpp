@@ -23,7 +23,7 @@ void Game::startGame() {
   while (gameActive) {
     handleUserInput();
 
-    // Player walk
+    // Player walk forward (use elapsed time to make it framerate-independent)
     playerProgress += (playerMoveSpeed * sdl.elapsedTime()) / 1000.0;
 
     // Update camera to player position
