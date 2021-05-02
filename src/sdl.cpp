@@ -1,7 +1,7 @@
 #include <SDL.h>
 #include "../include/sdl.hpp"
 
-#define GROUND_Y height - (screenHeight / 2) - CAMERA_HEIGHT
+#define GROUND_Y height - (screenHeight / 2)
 
 void SDLWrapper::drawFloor() {
   // Get renderer
@@ -10,7 +10,7 @@ void SDLWrapper::drawFloor() {
   // Draw left border
   SDL_RenderDrawLine(
     rendererPtr,
-    x(-floorWidth / 2),
+    x(-floorWidth / 2 - cameraX),
     y(-screenHeight / 2 - CAMERA_HEIGHT),
     x(0),
     y(0)
@@ -19,7 +19,7 @@ void SDLWrapper::drawFloor() {
   // Draw right border
   SDL_RenderDrawLine(
     rendererPtr,
-    x(floorWidth / 2),
+    x(floorWidth / 2 - cameraX),
     y(-screenHeight / 2 - CAMERA_HEIGHT),
     x(0),
     y(0)
@@ -28,21 +28,20 @@ void SDLWrapper::drawFloor() {
 
 SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width, int height, int distance) {
   return SDL_Rect({
-    x(perspective(bottomLeft, distance)),
-    // Assume y = bottom of screen - camera height
-    y(perspective(GROUND_Y, distance)),
-    perspective(width, distance),
-    perspective(height, distance)
+    x(perspective(bottomLeft, distance, AXIS_X)),
+    y(perspective(GROUND_Y, distance, AXIS_Y)),
+    perspective(width, distance, DISTANCE),
+    perspective(height, distance, DISTANCE)
     });
 }
 
 void SDLWrapper::drawEdge(int pointX, int pointY, int distance) {
   SDL_RenderDrawLine(
     renderer.get(),
-    x(perspective(pointX, distance)),
-    y(perspective(pointY - CAMERA_HEIGHT, distance)),
-    x(perspective(pointX, distance + OBSTACLE_DEPTH)),
-    y(perspective(pointY - CAMERA_HEIGHT, distance + OBSTACLE_DEPTH))
+    x(perspective(pointX, distance, AXIS_X)),
+    y(perspective(pointY, distance, AXIS_Y)),
+    x(perspective(pointX, distance + OBSTACLE_DEPTH, AXIS_X)),
+    y(perspective(pointY, distance + OBSTACLE_DEPTH, AXIS_Y))
   );
 }
 

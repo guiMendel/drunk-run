@@ -11,6 +11,10 @@
 #define CAMERA_HEIGHT 650
 #define OBSTACLE_DEPTH 500
 
+#define DISTANCE 0
+#define AXIS_X 1
+#define AXIS_Y 2
+
 // Wrapper for SDL
 class SDLWrapper {
 public:
@@ -52,10 +56,15 @@ public:
   void drawObstacle(int bottomLeft, int width, int height, int distance);
 
   // Applies perspective to a point
-  int perspective(int point, int distance) { return point * eyeDistance / (eyeDistance + distance); }
+  int perspective(int point, int distance, short offsetType) {
+    // If X axis, offset to camera position. If Y axis, offset to camera height.
+    int offset = 0;
+    if (offsetType) offset = (offsetType == AXIS_X ? cameraX : CAMERA_HEIGHT);
+    return (point - offset) * eyeDistance / (eyeDistance + distance);
+  }
 
-  // Converts horizontal positioning from SDL to window-centered, relative to cameraX
-  int x(int value) { return screenWidth / 2 + value - cameraX; }
+  // Converts horizontal positioning from SDL to window-centered
+  int x(int value) { return screenWidth / 2 + value; }
 
   // Converts vertical positioning from SDL to window-centered
   int y(int value) { return screenHeight / 2 - value; }
