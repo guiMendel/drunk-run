@@ -14,7 +14,15 @@ public:
   static const int SCREEN_HEIGHT = 600;
 
   static const int sideWalkWidth = 2400;
-  static const int playerMoveSpeed = 1;
+  // Speed in which player moves ahead
+  static const int playerAdvanceSpeed = 1000;
+
+  // Speed cap for player's lateral movement
+  static constexpr float playerMoveSpeedCap = 2400.0;
+  // Acceleration for player's lateral movement
+  static constexpr float playerMoveAcceleration = 10000.0;
+  // Acceleration for player's lateral halting
+  static constexpr float playerHaltAcceleration = 2000.0;
 
   Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth) {}
 
@@ -29,13 +37,13 @@ private:
   void handleUserInput() { sdl.resolveEvents(eventHandlerWrapper, this); }
 
   // Updates the player position on the world based on it's speed
-  void applyMovement(Uint32 frameTime);
+  void applyMovement(float frameTime);
 
   // Sets lateral movement. The movement will be applied each frame
-  void startMoving(int speed) { speedX = speed; }
+  void startMoving(float acceleration) { accelerationX = acceleration; }
 
   // Stops lateral movement
-  void haltMovement() { speedX = 0; }
+  void haltMovement() { accelerationX = 0.0; }
 
   // Move player to the side
   void movePlayer(int offset);
@@ -49,11 +57,14 @@ private:
   // Amount of units the player has advanced
   float playerProgress{ 0.0 };
 
-  // Amount of units per second the player is moving on the x axis
-  int speedX{ 0 };
-
   // Amount of units the player is offset on the x axis
   int playerX{ 0 };
+
+  // Amount of units per second the player is moving on the x axis
+  float speedX{ 0.0 };
+
+  // Amount of speed the player is gaining on the x axis
+  float accelerationX{ 0.0 };
 };
 
 #endif

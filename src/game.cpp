@@ -1,5 +1,7 @@
 #include <SDL.h>
-#include "algorithm"
+#include <algorithm>
+#include <cmath>
+#include <iostream>
 #include "../include/game.hpp"
 
 int clampMirrored(int a, int b) {
@@ -18,17 +20,18 @@ void Game::eventHandler(SDL_Event& event) {
 
   // Player input start
   else if (event.type == SDL_KEYDOWN) {
+    std::cout << "Hit" << std::endl;
     switch (event.key.keysym.sym) {
       // Stumble left
     case SDLK_a:
     case SDLK_LEFT:
-      startMoving(-playerMoveSpeed);
+      startMoving(-playerMoveAcceleration);
       break;
 
       // Stumble right
     case SDLK_d:
     case SDLK_RIGHT:
-      startMoving(playerMoveSpeed);
+      startMoving(playerMoveAcceleration);
       break;
     }
   }
@@ -39,24 +42,48 @@ void Game::eventHandler(SDL_Event& event) {
       // Stop left
     case SDLK_a:
     case SDLK_LEFT:
-      if (speedX < 0) haltMovement();
+      if (accelerationX < 0) haltMovement();
       break;
 
       // Stop right
     case SDLK_d:
     case SDLK_RIGHT:
-      if (speedX > 0) haltMovement();
+      if (accelerationX > 0) haltMovement();
       break;
     }
   }
 }
 
-void Game::applyMovement(Uint32 frameTime) {
+void Game::applyMovement(float frameTime) {
+
+  // Lateral acceleration
+  if (accelerationX) {
+    // std::cout << accelerationX * frameTime << std::endl;
+    speedX = std::clamp(
+      speedX + accelerationX * frameTime,
+      -playerMoveSpeedCap,
+      playerMoveSpeedCap
+    );
+  }
+  // If no acceleration, try to halt
+  else if (speedX) {
+    // Get move direction
+    short direction = speedX > 0 ? 1 : -1;
+    // Reduce speed
+    float speed = std::max(std::abs(speedX) - playerHaltAcceleration * frameTime, (float)0.0);
+    // Restore direction
+    speedX = speed * direction;
+  }
+  // std::cout << speedX << std::endl;
+
+  // For whatever reason, this seems to smooth out player acceleration tremendously
+  SDL_Delay(1);
+
   // Lateral movement
   if (speedX) movePlayer(speedX * frameTime);
 
   // Front movement
-  playerProgress += (playerMoveSpeed * frameTime);
+  playerProgress += (playerAdvanceSpeed * frameTime);
 }
 
 void Game::movePlayer(int offset) {
@@ -75,7 +102,8 @@ void Game::startGame() {
   // Initialize game loop
   while (gameActive) {
     // Get elapsed frame time
-    Uint32 frameTime = sdl.elapsedTime();
+    float frameTime = sdl.elapsedTime() / 1000.0;
+    // std::cout << frameTime << std::endl;
 
     // Handle input
     handleUserInput();
