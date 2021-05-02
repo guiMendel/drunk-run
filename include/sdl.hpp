@@ -8,11 +8,15 @@
 #include <cstdint>
 #include <iostream>
 
+// Config params
+
 #define CAMERA_HEIGHT 650
 #define OBSTACLE_DEPTH 500
 
 #define OBSTACLE_COLOR 0x00, 0x00, 0x00, 0xFF
-#define OBSTACLE_SIDE_COLOR 0x88, 0x88, 0x88, 0xFF
+#define OBSTACLE_SIDE_COLOR 0x33, 0x33, 0x33, 0xFF
+
+// Macros
 
 #define DISTANCE 0
 #define AXIS_X 1
@@ -59,8 +63,9 @@ public:
   void drawObstacle(int bottomLeft, int width, int height, int distance);
 
   // Applies perspective to a point
+  // offsetType is used to make the final position relative to the camera position
   int perspective(int point, int distance, short offsetType) {
-    // If X axis, offset to camera position. If Y axis, offset to camera height.
+    // If X axis, offset to camera X position. If Y axis, offset to camera height.
     int offset = 0;
     if (offsetType) offset = (offsetType == AXIS_X ? cameraX : CAMERA_HEIGHT);
     return (point - offset) * eyeDistance / (eyeDistance + distance);

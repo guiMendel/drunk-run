@@ -44,6 +44,7 @@ void Game::eventHandler(SDL_Event& event) {
 
   // Player input stop
   else if (event.type == SDL_KEYUP) {
+    // Only halt if released key corresponds to currently active key
     switch (event.key.keysym.sym) {
       // Stop left
     case SDLK_a:
@@ -61,7 +62,6 @@ void Game::eventHandler(SDL_Event& event) {
 }
 
 void Game::applyMovement(float frameTime) {
-
   // Lateral acceleration
   if (accelerationX) {
     // std::cout << accelerationX * frameTime << std::endl;
@@ -71,7 +71,7 @@ void Game::applyMovement(float frameTime) {
       playerMoveSpeedCap
     );
   }
-  // If no acceleration, try to halt
+  // If no acceleration, start halting (as long as player is still moving)
   else if (speedX) {
     // Get move direction
     short direction = speedX > 0 ? 1 : -1;
@@ -88,7 +88,7 @@ void Game::applyMovement(float frameTime) {
   // Lateral movement
   if (speedX) movePlayer(speedX * frameTime);
 
-  // Front movement
+  // Frontal movement
   playerProgress += (playerAdvanceSpeed * frameTime);
 }
 

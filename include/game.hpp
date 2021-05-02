@@ -13,7 +13,11 @@ public:
   static const int SCREEN_WIDTH = 800;
   static const int SCREEN_HEIGHT = 600;
 
+  // Config constants
+
+  // Space the player has to move around
   static const int sideWalkWidth = 2400;
+
   // Speed in which player moves ahead
   static const int playerAdvanceSpeed = 1000;
 
@@ -37,6 +41,7 @@ private:
   void handleUserInput() { sdl.resolveEvents(eventHandlerWrapper, this); }
 
   // Updates the player position on the world based on it's speed
+  // frameTime makes movement framerate-independent
   void applyMovement(float frameTime);
 
   // Sets lateral movement. The movement will be applied each frame
