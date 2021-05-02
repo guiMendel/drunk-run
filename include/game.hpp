@@ -20,7 +20,7 @@ public:
   // Speed cap for player's lateral movement
   static constexpr float playerMoveSpeedCap = 2400.0;
   // Acceleration for player's lateral movement
-  static constexpr float playerMoveAcceleration = 10000.0;
+  static constexpr float playerMoveAcceleration = 7000.0;
   // Acceleration for player's lateral halting
   static constexpr float playerHaltAcceleration = 2000.0;
 
