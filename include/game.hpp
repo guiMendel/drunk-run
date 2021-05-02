@@ -14,7 +14,7 @@ public:
   static const int SCREEN_HEIGHT = 600;
 
   static const int sideWalkWidth = 2400;
-  static const int playerMoveSpeed = 1000;
+  static const int playerMoveSpeed = 1;
 
   Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth) {}
 
@@ -28,6 +28,18 @@ private:
   // Handles current SDL event queue
   void handleUserInput() { sdl.resolveEvents(eventHandlerWrapper, this); }
 
+  // Updates the player position on the world based on it's speed
+  void applyMovement(Uint32 frameTime);
+
+  // Sets lateral movement. The movement will be applied each frame
+  void startMoving(int speed) { speedX = speed; }
+
+  // Stops lateral movement
+  void haltMovement() { speedX = 0; }
+
+  // Move player to the side
+  void movePlayer(int offset);
+
   // SDL Wrapper instance
   SDLWrapper sdl;
 
@@ -36,6 +48,12 @@ private:
 
   // Amount of units the player has advanced
   float playerProgress{ 0.0 };
+
+  // Amount of units per second the player is moving on the x axis
+  int speedX{ 0 };
+
+  // Amount of units the player is offset on the x axis
+  int playerX{ 0 };
 };
 
 #endif

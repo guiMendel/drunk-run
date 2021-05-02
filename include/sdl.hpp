@@ -41,7 +41,7 @@ public:
   void resolveEvents(void(*eventHandler)(void*, SDL_Event&), void*);
 
   // Update camera position
-  void setCamera(float z) { cameraZ = z; }
+  void setCamera(int x, float z) { cameraX = x; cameraZ = z; }
 
   //////////////////////// GEOMETRY
 
@@ -54,8 +54,8 @@ public:
   // Applies perspective to a point
   int perspective(int point, int distance) { return point * eyeDistance / (eyeDistance + distance); }
 
-  // Converts horizontal positioning from SDL to window-centered
-  int x(int value) { return screenWidth / 2 + value; }
+  // Converts horizontal positioning from SDL to window-centered, relative to cameraX
+  int x(int value) { return screenWidth / 2 + value - cameraX; }
 
   // Converts vertical positioning from SDL to window-centered
   int y(int value) { return screenHeight / 2 - value; }
@@ -107,6 +107,9 @@ private:
 
   // Camera z position
   float cameraZ{ 0.0 };
+
+  // Camera x position
+  int cameraX{ 0 };
 };
 
 #endif
