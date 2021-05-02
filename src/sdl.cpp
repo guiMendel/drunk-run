@@ -6,6 +6,8 @@
 void SDLWrapper::drawFloor() {
   // Get renderer
   auto rendererPtr = renderer.get();
+  
+  SDL_SetRenderDrawColor(rendererPtr, OBSTACLE_COLOR);
 
   // Draw left border
   SDL_RenderDrawLine(
@@ -30,9 +32,37 @@ SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width, int height, int distanc
   return SDL_Rect({
     x(perspective(bottomLeft, distance, AXIS_X)),
     y(perspective(GROUND_Y, distance, AXIS_Y)),
-    perspective(width, distance, DISTANCE),
+    perspective(width + 4, distance, DISTANCE),
     perspective(height, distance, DISTANCE)
     });
+}
+
+void SDLWrapper::drawSides(int bottomLeft, int width, int height, int distance) {
+  const int startingY = -(screenHeight / 2) + 5;
+  const int finalY = -(screenHeight / 2) + height;
+  const int startingX = bottomLeft;
+  const int finalX = bottomLeft + width;
+
+  // Paint color
+  SDL_SetRenderDrawColor(renderer.get(), OBSTACLE_SIDE_COLOR);
+
+  // Draw left and right sides
+  for (int y = startingY; y <= finalY; y++) {
+    // Left
+    drawEdge(startingX, y, distance);
+    // Right
+    drawEdge(finalX, y, distance);
+  }
+
+  // Draw top side
+  for (int x = startingX; x <= finalX; x++) drawEdge(x, finalY, distance);
+
+  // // Draw edges
+  // drawEdge(bottomLeft, -(screenHeight / 2) + 5, distance);
+  // drawEdge(bottomLeft + width - 2, -(screenHeight / 2) + 5, distance);
+  // drawEdge(bottomLeft, -(screenHeight / 2) + height, distance);
+  // drawEdge(bottomLeft + width - 2, -(screenHeight / 2) + height, distance);
+
 }
 
 void SDLWrapper::drawEdge(int pointX, int pointY, int distance) {
@@ -55,19 +85,20 @@ void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distanc
   // Get renderer
   auto rendererPtr = renderer.get();
 
+  // Draw sides
+  drawSides(bottomLeft, width, height, distance);
+
+  // Paint color
+  SDL_SetRenderDrawColor(rendererPtr, OBSTACLE_COLOR);
+
   // Draw front face
   SDL_Rect outlineRect = makeRect(bottomLeft, width, height, distance);
-  SDL_RenderDrawRect(rendererPtr, &outlineRect);
+  SDL_RenderFillRect(rendererPtr, &outlineRect);
 
-  // Draw back face
-  outlineRect = makeRect(bottomLeft, width, height, distance + OBSTACLE_DEPTH);
-  SDL_RenderDrawRect(rendererPtr, &outlineRect);
+  // // Draw back face
+  // outlineRect = makeRect(bottomLeft, width, height, distance + OBSTACLE_DEPTH);
+  // SDL_RenderFillRect(rendererPtr, &outlineRect);
 
-  // Draw edges
-  drawEdge(bottomLeft, -(screenHeight / 2) + 5, distance);
-  drawEdge(bottomLeft + width - 2, -(screenHeight / 2) + 5, distance);
-  drawEdge(bottomLeft, -(screenHeight / 2) + height, distance);
-  drawEdge(bottomLeft + width - 2, -(screenHeight / 2) + height, distance);
 }
 
 void SDLWrapper::drawShapes() {
@@ -78,9 +109,6 @@ void SDLWrapper::drawShapes() {
   SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0xFF, 0xFF, 0xFF);
   SDL_RenderClear(rendererPtr);
 
-  // Paint black
-  SDL_SetRenderDrawColor(rendererPtr, 0x00, 0x00, 0x00, 0xFF);
-
   // Draw floor
   drawFloor();
 
@@ -89,16 +117,16 @@ void SDLWrapper::drawShapes() {
   // SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
   // Render rect
-  drawObstacle(-400, 300, 1200, 3000);
+  drawObstacle(-350, 500, 1000, 10000);
 
   // Render rect
-  drawObstacle(-350, 500, 1000, 10000);
+  drawObstacle(300, 200, 700, 6500);
 
   // Render rect
   drawObstacle(-50, 100, 200, 4800);
 
   // Render rect
-  drawObstacle(300, 200, 700, 6500);
+  drawObstacle(-400, 300, 1200, 3000);
 
   // Render rect
   // drawObstacle(300, 300, 800, 6000);
