@@ -72,6 +72,9 @@ public:
   // Converts vertical positioning from SDL to window-centered
   int y(int value) { return screenHeight / 2 - value; }
 
+  // Toggles etween drawing wireframes or filled cubes
+  void toggleWireframe() { wireframesOnly = !wireframesOnly; }
+
   //////////////////////// HELPERS
 
   // Returns amount of miliseconds elapsed from last call to this same method
@@ -100,6 +103,9 @@ private:
 
   // Draw the borders of the ground
   void drawFloor();
+
+  // If turned on, draws only wireframes
+  bool wireframesOnly{ false };
 
   // Keeps track of the last time the elapsedTime method was called
   Uint32 timeStick{ 0 };

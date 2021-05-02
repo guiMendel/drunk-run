@@ -6,7 +6,7 @@
 void SDLWrapper::drawFloor() {
   // Get renderer
   auto rendererPtr = renderer.get();
-  
+
   SDL_SetRenderDrawColor(rendererPtr, OBSTACLE_COLOR);
 
   // Draw left border
@@ -42,27 +42,32 @@ void SDLWrapper::drawSides(int bottomLeft, int width, int height, int distance) 
   const int finalY = -(screenHeight / 2) + height;
   const int startingX = bottomLeft;
   const int finalX = bottomLeft + width;
-
+  
   // Paint color
-  SDL_SetRenderDrawColor(renderer.get(), OBSTACLE_SIDE_COLOR);
+  SDL_SetRenderDrawColor(renderer.get(), OBSTACLE_COLOR);
 
-  // Draw left and right sides
-  for (int y = startingY; y <= finalY; y++) {
-    // Left
-    drawEdge(startingX, y, distance);
-    // Right
-    drawEdge(finalX, y, distance);
+  // Draw edges
+  drawEdge(startingX, startingY, distance);
+  drawEdge(startingX, finalY, distance);
+  drawEdge(finalX, finalY, distance);
+  drawEdge(finalX, startingY, distance);
+
+  // Draw filled sides
+  if (!wireframesOnly) {
+    // Paint color
+    SDL_SetRenderDrawColor(renderer.get(), OBSTACLE_SIDE_COLOR);
+
+    // Draw left and right sides
+    for (int y = startingY + 1; y < finalY; y++) {
+      // Left
+      drawEdge(startingX, y, distance);
+      // Right
+      drawEdge(finalX, y, distance);
+    }
+
+    // Draw top side
+    for (int x = startingX + 1; x < finalX; x++) drawEdge(x, finalY, distance);
   }
-
-  // Draw top side
-  for (int x = startingX; x <= finalX; x++) drawEdge(x, finalY, distance);
-
-  // // Draw edges
-  // drawEdge(bottomLeft, -(screenHeight / 2) + 5, distance);
-  // drawEdge(bottomLeft + width - 2, -(screenHeight / 2) + 5, distance);
-  // drawEdge(bottomLeft, -(screenHeight / 2) + height, distance);
-  // drawEdge(bottomLeft + width - 2, -(screenHeight / 2) + height, distance);
-
 }
 
 void SDLWrapper::drawEdge(int pointX, int pointY, int distance) {
@@ -93,12 +98,17 @@ void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distanc
 
   // Draw front face
   SDL_Rect outlineRect = makeRect(bottomLeft, width, height, distance);
-  SDL_RenderFillRect(rendererPtr, &outlineRect);
 
-  // // Draw back face
-  // outlineRect = makeRect(bottomLeft, width, height, distance + OBSTACLE_DEPTH);
-  // SDL_RenderFillRect(rendererPtr, &outlineRect);
+  // Filled
+  if (!wireframesOnly) SDL_RenderFillRect(rendererPtr, &outlineRect);
+  // Wireframe
+  else {
+    SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
+    // Draw back face
+    outlineRect = makeRect(bottomLeft, width, height, distance + OBSTACLE_DEPTH);
+    SDL_RenderDrawRect(rendererPtr, &outlineRect);
+  }
 }
 
 void SDLWrapper::drawShapes() {

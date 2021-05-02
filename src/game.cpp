@@ -34,6 +34,11 @@ void Game::eventHandler(SDL_Event& event) {
     case SDLK_RIGHT:
       startMoving(playerMoveAcceleration);
       break;
+
+      // Toggle wireframes
+    case SDLK_w:
+      sdl.toggleWireframe();
+      break;
     }
   }
 
