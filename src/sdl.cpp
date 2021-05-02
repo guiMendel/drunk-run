@@ -3,6 +3,29 @@
 
 #define GROUND_Y height - (screenHeight / 2) - CAMERA_HEIGHT
 
+void SDLWrapper::drawFloor() {
+  // Get renderer
+  auto rendererPtr = renderer.get();
+
+  // Draw left border
+  SDL_RenderDrawLine(
+    rendererPtr,
+    x(-floorWidth / 2),
+    y(-screenHeight / 2 - CAMERA_HEIGHT),
+    x(0),
+    y(0)
+  );
+
+  // Draw right border
+  SDL_RenderDrawLine(
+    rendererPtr,
+    x(floorWidth / 2),
+    y(-screenHeight / 2 - CAMERA_HEIGHT),
+    x(0),
+    y(0)
+  );
+}
+
 SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width, int height, int distance) {
   return SDL_Rect({
     x(perspective(bottomLeft, distance)),
@@ -58,6 +81,9 @@ void SDLWrapper::drawShapes() {
 
   // Paint black
   SDL_SetRenderDrawColor(rendererPtr, 0x00, 0x00, 0x00, 0xFF);
+
+  // Draw floor
+  drawFloor();
 
   // //Render outlined quad
   // SDL_Rect outlineRect = { x(-200), y(200), 400, 400 };

@@ -8,16 +8,17 @@
 #include <cstdint>
 #include <iostream>
 
-#define CAMERA_HEIGHT 300
+#define CAMERA_HEIGHT 650
 #define OBSTACLE_DEPTH 500
 
 // Wrapper for SDL
 class SDLWrapper {
 public:
   // Initialize window's & renderer's unique_ptr deleter
-  SDLWrapper(int width, int height) :
+  SDLWrapper(int width, int height, int floorWidth) :
     screenWidth(width),
     screenHeight(height),
+    floorWidth(floorWidth),
     window(nullptr, SDL_DestroyWindow),
     renderer(nullptr, SDL_DestroyRenderer) {
     // Initialize SDL
@@ -82,6 +83,9 @@ private:
   // Draw a line from a point to it's corresponding depth
   void drawEdge(int pointX, int pointY, int distance);
 
+  // Draw the borders of the ground
+  void drawFloor();
+
   // Keeps track of the last time the elapsedTime method was called
   Uint32 timeStick{ 0 };
 
@@ -91,6 +95,9 @@ private:
   // Window dimensions
   int screenWidth;
   int screenHeight;
+
+  // Width of the floor
+  int floorWidth;
 
   // The window we'll be rendering to
   std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> window;

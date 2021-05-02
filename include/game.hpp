@@ -13,9 +13,10 @@ public:
   static const int SCREEN_WIDTH = 800;
   static const int SCREEN_HEIGHT = 600;
 
+  static const int sideWalkWidth = 2400;
   static const int playerMoveSpeed = 1000;
 
-  Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT) {}
+  Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth) {}
 
   // Opens window and starts main game loop
   void startGame();
