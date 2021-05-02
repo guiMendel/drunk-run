@@ -14,13 +14,14 @@ void eventHandlerWrapper(void* context, SDL_Event& event) {
 
 void Game::eventHandler(SDL_Event& event) {
   // User requests quit
-  if (event.type == SDL_QUIT) {
-    gameActive = false;
-  }
+  if (event.type == SDL_QUIT) gameActive = false;
 
   // Player input start
   else if (event.type == SDL_KEYDOWN) {
-    std::cout << "Hit" << std::endl;
+    // Quit on q
+    if (event.key.keysym.sym == SDLK_q) gameActive = false;
+
+    // std::cout << "Hit" << std::endl;
     switch (event.key.keysym.sym) {
       // Stumble left
     case SDLK_a:
