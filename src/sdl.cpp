@@ -1,7 +1,22 @@
 #include <SDL.h>
 #include "../include/sdl.hpp"
+#include <iostream>
 
 #define GROUND_Y height - (screenHeight / 2)
+
+void SDLWrapper::setCamera(int x, float z) {
+  cameraX = x;
+  cameraZ = z;
+
+  // Destroy all objects that were left behind
+  while (obstacles.size() > 0 && obstacles.front()->z < cameraZ) {
+    // Checks for collision
+    // collisionCheck();
+
+    // Destroys this obstacle
+    obstacles.pop_front();
+  }
+}
 
 void SDLWrapper::drawFloor() {
   // Get renderer
@@ -42,7 +57,7 @@ void SDLWrapper::drawSides(int bottomLeft, int width, int height, int distance) 
   const int finalY = -(screenHeight / 2) + height;
   const int startingX = bottomLeft;
   const int finalX = bottomLeft + width;
-  
+
   // Paint color
   SDL_SetRenderDrawColor(renderer.get(), OBSTACLE_COLOR);
 
@@ -80,24 +95,24 @@ void SDLWrapper::drawEdge(int pointX, int pointY, int distance) {
   );
 }
 
-void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distance) {
+void SDLWrapper::drawObstacle(Obstacle& obstacle) {
   // Relative distance to camera
-  distance -= cameraZ;
+  int distance = obstacle.z - cameraZ;
 
-  // Ignore obstacles beyond the camera
+  // Ignore obstacles beyond the camera (there shouldnt be any though)
   if (distance < 0) return;
 
   // Get renderer
   auto rendererPtr = renderer.get();
 
   // Draw sides
-  drawSides(bottomLeft, width, height, distance);
+  drawSides(obstacle.bottomLeft, obstacle.width, obstacle.height, distance);
 
   // Paint color
   SDL_SetRenderDrawColor(rendererPtr, OBSTACLE_COLOR);
 
   // Draw front face
-  SDL_Rect outlineRect = makeRect(bottomLeft, width, height, distance);
+  SDL_Rect outlineRect = makeRect(obstacle.bottomLeft, obstacle.width, obstacle.height, distance);
 
   // Filled
   if (!wireframesOnly) SDL_RenderFillRect(rendererPtr, &outlineRect);
@@ -106,12 +121,12 @@ void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distanc
     SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
     // Draw back face
-    outlineRect = makeRect(bottomLeft, width, height, distance + OBSTACLE_DEPTH);
+    outlineRect = makeRect(obstacle.bottomLeft, obstacle.width, obstacle.height, distance + OBSTACLE_DEPTH);
     SDL_RenderDrawRect(rendererPtr, &outlineRect);
   }
 }
 
-void SDLWrapper::drawShapes() {
+void SDLWrapper::renderFrame() {
   // Get renderer pointer
   auto rendererPtr = renderer.get();
 
@@ -122,33 +137,17 @@ void SDLWrapper::drawShapes() {
   // Draw floor
   drawFloor();
 
-  // //Render outlined quad
-  // SDL_Rect outlineRect = { x(-200), y(200), 400, 400 };
-  // SDL_RenderDrawRect(rendererPtr, &outlineRect);
+  // Draw each one of the obstacles
 
-  // Render rect
-  drawObstacle(-350, 500, 1000, 10000);
+  for (auto obstacle = obstacles.rbegin(); obstacle != obstacles.rend(); obstacle++) {
+    // Dereferentiate iterator and unique_ptr
+    drawObstacle(**obstacle);
+  }
 
-  // Render rect
-  drawObstacle(300, 200, 700, 6500);
-
-  // Render rect
-  drawObstacle(-50, 100, 200, 4800);
-
-  // Render rect
-  drawObstacle(-400, 300, 1200, 3000);
-
-  // Render rect
-  // drawObstacle(300, 300, 800, 6000);
-
-  // //Draw blue horizontal line
-  // SDL_RenderDrawLine(rendererPtr, 0, screenHeight / 2, screenWidth, screenHeight / 2);
-
-  // // Draw dot
-  // SDL_RenderDrawPoint(rendererPtr, x(0), y(100));
-
-  //Update screen
+  // Update screen
   SDL_RenderPresent(rendererPtr);
+
+  // std::cout << obstacles.size() << std::endl;
 }
 
 

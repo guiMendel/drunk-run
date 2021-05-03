@@ -4,7 +4,10 @@
 #include <iostream>
 #include "../include/game.hpp"
 
-int clampMirrored(int a, int b) {
+// Clamp a given speed to boundaries set by moveSpeedCap
+#define CLAMP_SPEED(speed) std::clamp((float)(speed), -moveSpeedCap, moveSpeedCap)
+
+static int clampMirrored(int a, int b) {
   return std::clamp(a, -b / 2, b / 2);
 }
 
@@ -23,16 +26,16 @@ void Game::eventHandler(SDL_Event& event) {
 
     // std::cout << "Hit" << std::endl;
     switch (event.key.keysym.sym) {
-      // Stumble left
+      // Move left
     case SDLK_a:
     case SDLK_LEFT:
-      startMoving(-playerMoveAcceleration);
+      startMoving(-moveAcceleration);
       break;
 
-      // Stumble right
+      // Move right
     case SDLK_d:
     case SDLK_RIGHT:
-      startMoving(playerMoveAcceleration);
+      startMoving(moveAcceleration);
       break;
 
       // Toggle wireframes
@@ -61,22 +64,18 @@ void Game::eventHandler(SDL_Event& event) {
   }
 }
 
-void Game::applyMovement(float frameTime) {
+void Game::applyMovement() {
   // Lateral acceleration
   if (accelerationX) {
     // std::cout << accelerationX * frameTime << std::endl;
-    speedX = std::clamp(
-      speedX + accelerationX * frameTime,
-      -playerMoveSpeedCap,
-      playerMoveSpeedCap
-    );
+    speedX = CLAMP_SPEED(speedX + accelerationX * frameTime);
   }
   // If no acceleration, start halting (as long as player is still moving)
   else if (speedX) {
     // Get move direction
     short direction = speedX > 0 ? 1 : -1;
     // Reduce speed
-    float speed = std::max(std::abs(speedX) - playerHaltAcceleration * frameTime, (float)0.0);
+    float speed = std::max(std::abs(speedX) - haltAcceleration * frameTime, (float)0.0);
     // Restore direction
     speedX = speed * direction;
   }
@@ -89,13 +88,64 @@ void Game::applyMovement(float frameTime) {
   if (speedX) movePlayer(speedX * frameTime);
 
   // Frontal movement
-  playerProgress += (playerAdvanceSpeed * frameTime);
+  playerProgress += (speedZ * frameTime);
 }
 
 void Game::movePlayer(int offset) {
   // Apply movement
   // Restrict to sidewalk boundaries
   playerX = clampMirrored(playerX + offset, sideWalkWidth);
+}
+
+// Sets time until next stumble
+void Game::setStumbleTimer(float time) {
+  // If a valid time was provided, we stick to it
+  if (time > 0.0) {
+    stumbleTimer = time;
+    return;
+  }
+
+  // Get random stumble countdown
+  auto countdown = randomFloat(averageStumbleInterval, stumbleIntervalStandardDeviation);
+
+  // Sets a lower boundary
+  stumbleTimer = std::max(countdown, (float)0.2);
+  // std::cout << stumbleTimer << std::endl;
+}
+
+void Game::stumble() {
+  // Discount elapsed time from stumble timer
+  stumbleTimer -= frameTime;
+
+  // If timer ticks, stumble!
+  if (stumbleTimer <= 0.0) {
+    // Set up next stumble
+    setStumbleTimer();
+
+    // Get stumble speed
+    auto stumbleSpeed = randomFloat(averageStumbleIntensity, stumbleIntensityStandardDeviation);
+
+    // Get a stumble direction
+    auto stumbleDirection = (randomGenerator() % 2 == 0) ? 1 : -1;
+
+    // Apply stumble speed
+    speedX = CLAMP_SPEED(speedX + stumbleSpeed * stumbleDirection);
+  }
+}
+
+void Game::speedUp() {
+  // Discount elapsed time from speed up timer
+  speedUpTimer -= frameTime;
+
+  // If timer ticks, speed up!
+  if (speedUpTimer <= 0.0) {
+    // Set up next speed up
+    speedUpTimer = speedUpRate;
+
+    // Apply speed up
+    speedZ += speedUpAmount;
+    // std::cout << speedZ << std::endl;
+  }
 }
 
 void Game::startGame() {
@@ -105,21 +155,45 @@ void Game::startGame() {
   // Set game loop to true
   gameActive = true;
 
+  // Set off player stumbling
+  setStumbleTimer(2.0);
+
+  // Set off speed ups
+  speedUpTimer = 2.0;
+
+  // Render rect
+  sdl.newObstacle(-400, 300, 1200, 3000);
+
+  // Render rect
+  sdl.newObstacle(-50, 100, 200, 4800);
+
+  // Render rect
+  sdl.newObstacle(300, 200, 700, 6500);
+
+  // Render rect
+  sdl.newObstacle(-350, 500, 1000, 10000);
+
   // Initialize game loop
   while (gameActive) {
     // Get elapsed frame time
-    float frameTime = sdl.elapsedTime() / 1000.0;
+    frameTime = sdl.elapsedTime() / 1000.0;
     // std::cout << frameTime << std::endl;
 
     // Handle input
     handleUserInput();
 
     // Update player movement
-    applyMovement(frameTime);
+    applyMovement();
+
+    // Handle random stumbling
+    stumble();
+
+    // Handle player speed up
+    speedUp();
 
     // Update camera to player position
     sdl.setCamera(playerX, playerProgress);
 
-    sdl.drawShapes();
+    sdl.renderFrame();
   }
 }
