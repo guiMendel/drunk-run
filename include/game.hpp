@@ -11,11 +11,12 @@ void eventHandlerWrapper(void* context, SDL_Event& event);
 
 class Game {
 public:
-  /////////////// PUBLIC CONSTANTS
+  //////////////////////// PUBLIC CONSTANTS
+
   static const int SCREEN_WIDTH = 800;
   static const int SCREEN_HEIGHT = 600;
 
-  /////////////// CONFIG CONSTANTS
+  //////////////////////// CONFIG CONSTANTS
 
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
@@ -40,7 +41,7 @@ public:
   // Acceleration for player's lateral halting
   static constexpr float haltAcceleration = 2000.0;
 
-  //////// Stumbles
+  //////// Stumbling
 
   // Time average between random player stumbles, in seconds
   static constexpr float averageStumbleInterval = 1.5;
@@ -52,18 +53,25 @@ public:
   // Standard deviation for stumble intensity
   static constexpr float stumbleIntensityStandardDeviation = 800.0;
 
+  //////////////////////// GAME
 
   Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth) {}
 
   // Opens window and starts main game loop
   void startGame();
 
+  //////////////////////// SDL INTERACTION
+
   // Function that takes an SDL event and resolves it
   void eventHandler(SDL_Event& event);
 
 private:
+  //////////////////////// SDL INTERACTION
+
   // Handles current SDL event queue
   void handleUserInput() { sdl.resolveEvents(eventHandlerWrapper, this); }
+
+  //////////////////////// PLAYER MOVEMENT
 
   // Updates the player position on the world based on it's speed
   // frameTime makes movement framerate-independent
@@ -87,17 +95,13 @@ private:
   // Move player to the side
   void movePlayer(int offset);
 
-  // SDL Wrapper instance
-  SDLWrapper sdl;
-
-  // Random generator engine
-  std::default_random_engine randomGenerator{ (unsigned)time(NULL) };
-
-  // Indicates the amount of time elapsed from last frame to this frame, in seconds
-  float frameTime;
+  //////////////////////// MUTABLE STATE
 
   // Defines if the main game loop is ongoing
   bool gameActive{ false };
+
+  // Indicates the amount of time elapsed from last frame to this frame, in seconds
+  float frameTime;
 
   // Amount of units the player has advanced
   float playerProgress{ 0.0 };
@@ -119,6 +123,14 @@ private:
 
   // Time remaining until next speed-up, in seconds
   float speedUpTimer;
+
+  //////////////////////// CONSTANT STATE
+
+  // SDL Wrapper instance
+  SDLWrapper sdl;
+
+  // Random generator engine
+  std::default_random_engine randomGenerator{ (unsigned)time(NULL) };
 };
 
 #endif
