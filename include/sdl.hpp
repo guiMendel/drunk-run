@@ -9,6 +9,7 @@
 #include <iostream>
 #include <deque>
 #include <utility>
+#include "obstacle.hpp"
 
 // Config params
 
@@ -23,22 +24,6 @@
 #define DISTANCE 0
 #define AXIS_X 1
 #define AXIS_Y 2
-
-// Defines an obstacle
-struct Obstacle {
-  // X position of this obstacle's (fontal face) bottom left corner
-  int bottomLeft;
-  // Width of obstacle
-  int width;
-  // Height of obstacle
-  int height;
-  // Z position of this obstacle (frontal face)
-  int z;
-
-  Obstacle(int bottomLeft, int width, int height, int z) :
-    bottomLeft(bottomLeft), width(width), height(height), z(z) {
-  }
-};
 
 // Wrapper for SDL
 class SDLWrapper {

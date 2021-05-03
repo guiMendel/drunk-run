@@ -65,6 +65,7 @@ public:
   // Function that takes an SDL event and resolves it
   void eventHandler(SDL_Event& event);
 
+private:
   //////////////////////// HELPERS
 
   float randomFloat(float average, float standardDeviation) {
@@ -77,7 +78,6 @@ public:
     return (float)distribution(randomGenerator);
   }
 
-private:
   //////////////////////// SDL INTERACTION
 
   // Handles current SDL event queue
