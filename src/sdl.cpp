@@ -9,7 +9,7 @@ void SDLWrapper::setCamera(int x, float z) {
   cameraZ = z;
 
   // Destroy all objects that were left behind
-  while (obstacles.front()->z < cameraZ && obstacles.size() > 0) {
+  while (obstacles.size() > 0 && obstacles.front()->z < cameraZ) {
     // Checks for collision
     // collisionCheck();
 
