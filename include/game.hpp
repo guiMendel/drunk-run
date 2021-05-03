@@ -65,6 +65,18 @@ public:
   // Function that takes an SDL event and resolves it
   void eventHandler(SDL_Event& event);
 
+  //////////////////////// HELPERS
+
+  float randomFloat(float average, float standardDeviation) {
+    // Set up random interval
+    std::uniform_real_distribution<double> distribution(
+      average - standardDeviation,
+      average + standardDeviation
+    );
+
+    return (float)distribution(randomGenerator);
+  }
+
 private:
   //////////////////////// SDL INTERACTION
 

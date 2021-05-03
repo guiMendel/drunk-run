@@ -7,14 +7,6 @@
 // Clamp a given speed to boundaries set by moveSpeedCap
 #define CLAMP_SPEED(speed) std::clamp((float)(speed), -moveSpeedCap, moveSpeedCap)
 
-static std::uniform_real_distribution<double> makeDistribution(float average, float standardDeviation) {
-  // Set up random interval
-  return std::uniform_real_distribution<double>(
-    average - standardDeviation,
-    average + standardDeviation
-    );
-}
-
 static int clampMirrored(int a, int b) {
   return std::clamp(a, -b / 2, b / 2);
 }
@@ -113,11 +105,11 @@ void Game::setStumbleTimer(float time) {
     return;
   }
 
-  // Sets up random interval
-  auto distribution = makeDistribution(averageStumbleInterval, stumbleIntervalStandardDeviation);
+  // Get random stumble countdown
+  auto countdown = randomFloat(averageStumbleInterval, stumbleIntervalStandardDeviation);
 
   // Sets a lower boundary
-  stumbleTimer = std::max(distribution(randomGenerator), 0.2);
+  stumbleTimer = std::max(countdown, (float)0.2);
   // std::cout << stumbleTimer << std::endl;
 }
 
@@ -130,11 +122,8 @@ void Game::stumble() {
     // Set up next stumble
     setStumbleTimer();
 
-    // Set up random interval
-    auto distribution = makeDistribution(averageStumbleIntensity, stumbleIntensityStandardDeviation);
-
     // Get stumble speed
-    auto stumbleSpeed = distribution(randomGenerator);
+    auto stumbleSpeed = randomFloat(averageStumbleIntensity, stumbleIntensityStandardDeviation);
 
     // Get a stumble direction
     auto stumbleDirection = (randomGenerator() % 2 == 0) ? 1 : -1;
@@ -180,7 +169,7 @@ void Game::startGame() {
 
   // Render rect
   sdl.newObstacle(300, 200, 700, 6500);
-  
+
   // Render rect
   sdl.newObstacle(-350, 500, 1000, 10000);
 
