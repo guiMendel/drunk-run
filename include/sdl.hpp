@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <cstdint>
 #include <iostream>
+#include <list>
 
 // Config params
 
@@ -21,6 +22,18 @@
 #define DISTANCE 0
 #define AXIS_X 1
 #define AXIS_Y 2
+
+// Defines an obstacle
+struct Obstacle {
+  // X position of this obstacle's (fontal face) bottom left corner
+  int bottomLeft;
+  // Width of obstacle
+  int width;
+  // Height of obstacle
+  int height;
+  // Z position of this obstacle (frontal face)
+  int z;
+};
 
 // Wrapper for SDL
 class SDLWrapper {
@@ -54,13 +67,34 @@ public:
   // Update camera position
   void setCamera(int x, float z) { cameraX = x; cameraZ = z; }
 
-  //////////////////////// GEOMETRY
-
   // Renders a new frame
   void renderFrame();
 
-  // Draws a rectangle relative to it's distance from screen
-  void drawObstacle(int bottomLeft, int width, int height, int distance);
+  //////////////////////// OBSTACLE INTERFACE
+
+  // Create a new obstacle
+  void newObstacle(int bottomLeft, int width, int height, int distance);
+
+  // Toggles between drawing wireframes or filled cubes
+  void toggleWireframe() { wireframesOnly = !wireframesOnly; }
+
+  //////////////////////// HELPERS
+
+  // Returns amount of miliseconds elapsed from last frame to now
+  Uint32 elapsedTime() {
+    auto lastStick = timeStick;
+    timeStick = SDL_GetTicks();
+    return timeStick - lastStick;
+  }
+
+  // If first parameter isn't truthy, throws error with provided message and SDL error log
+  static void ensure(bool success, std::string errorMessage) {
+    if (!success)
+      throw std::runtime_error(errorMessage + "\n==> SDL error: " + SDL_GetError());
+  }
+
+private:
+  //////////////////////// GEOMETRY
 
   // Applies perspective to a point
   // offsetType is used to make the final position relative to the camera position
@@ -77,43 +111,39 @@ public:
   // Converts vertical positioning from SDL to window-centered
   int y(int value) { return screenHeight / 2 - value; }
 
-  // Toggles etween drawing wireframes or filled cubes
-  void toggleWireframe() { wireframesOnly = !wireframesOnly; }
-
-  //////////////////////// HELPERS
-
-  // Returns amount of miliseconds elapsed from last call to this same method
-  // First call is relative to object construction
-  Uint32 elapsedTime() {
-    auto lastStick = timeStick;
-    timeStick = SDL_GetTicks();
-    return timeStick - lastStick;
-  }
-
-  // If first parameter isn't truthy, throws error with provided message and SDL error log
-  static void ensure(bool success, std::string errorMessage) {
-    if (!success)
-      throw std::runtime_error(errorMessage + "\n==> SDL error: " + SDL_GetError());
-  }
-
-private:
   // Make an SDL Rect with y fixed on the ground and applying perspective
   SDL_Rect makeRect(int bottomLeft, int width, int height, int distance);
 
-  // Draw a line from a point to it's corresponding depth
-  void drawEdge(int pointX, int pointY, int distance);
+  // Draws a rectangle relative to it's distance from screen
+  void drawObstacle(int bottomLeft, int width, int height, int distance);
 
   // Draw the sides of an obstacle
   void drawSides(int bottomLeft, int width, int height, int distance);
 
+  // Draw a line from a point to it's corresponding depth
+  void drawEdge(int pointX, int pointY, int distance);
+
   // Draw the borders of the ground
   void drawFloor();
+
+  //////////////////////// MUTABLE STATE
+
+  // List of all active obstacles
+  std::list<Obstacle> obstacles;
 
   // If turned on, draws only wireframes
   bool wireframesOnly{ false };
 
-  // Keeps track of the last time the elapsedTime method was called
+  // Keeps track of the time elapsed between frames
   Uint32 timeStick{ 0 };
+
+  // Camera z position
+  float cameraZ{ 0.0 };
+
+  // Camera x position
+  int cameraX{ 0 };
+
+  //////////////////////// CONSTANT STATE
 
   // Simulated distance from eye to screen
   float eyeDistance;
@@ -130,12 +160,6 @@ private:
 
   // Renderer for the window
   std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> renderer;
-
-  // Camera z position
-  float cameraZ{ 0.0 };
-
-  // Camera x position
-  int cameraX{ 0 };
 };
 
 #endif

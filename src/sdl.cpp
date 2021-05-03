@@ -42,7 +42,7 @@ void SDLWrapper::drawSides(int bottomLeft, int width, int height, int distance) 
   const int finalY = -(screenHeight / 2) + height;
   const int startingX = bottomLeft;
   const int finalX = bottomLeft + width;
-  
+
   // Paint color
   SDL_SetRenderDrawColor(renderer.get(), OBSTACLE_COLOR);
 
@@ -134,7 +134,7 @@ void SDLWrapper::renderFrame() {
   // Render rect
   drawObstacle(-400, 300, 1200, 3000);
 
-  //Update screen
+  // Update screen
   SDL_RenderPresent(rendererPtr);
 }
 
