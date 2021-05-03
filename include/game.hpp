@@ -2,6 +2,8 @@
 #define __GAME__
 
 #include <SDL.h>
+#include <random>
+#include <ctime>
 #include "sdl.hpp"
 
 // Wraps eventHandler method into a function, provided the object's pointer
@@ -9,11 +11,11 @@ void eventHandlerWrapper(void* context, SDL_Event& event);
 
 class Game {
 public:
-  // Public constants
+  /////////////// PUBLIC CONSTANTS
   static const int SCREEN_WIDTH = 800;
   static const int SCREEN_HEIGHT = 600;
 
-  // Config constants
+  /////////////// CONFIG CONSTANTS
 
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
@@ -21,12 +23,27 @@ public:
   // Speed in which player moves ahead
   static const int playerAdvanceSpeed = 1000;
 
+  //////// Lateral Movement
+
   // Speed cap for player's lateral movement
   static constexpr float playerMoveSpeedCap = 2400.0;
   // Acceleration for player's lateral movement
   static constexpr float playerMoveAcceleration = 7000.0;
   // Acceleration for player's lateral halting
   static constexpr float playerHaltAcceleration = 2000.0;
+
+  //////// Stumbles
+
+  // Time average between random player stumbles, in seconds
+  static constexpr float averageStumbleInterval = 1.5;
+  // Standard deviation for stumble intervals
+  static constexpr float stumbleIntervalStandardDeviation = 1.0;
+
+  // Average intensity of random stumbles, in speed
+  static constexpr float averageStumbleIntensity = 1300.0;
+  // Standard deviation for stumble intensity
+  static constexpr float stumbleIntensityStandardDeviation = 800.0;
+
 
   Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth) {}
 
@@ -47,14 +64,23 @@ private:
   // Sets lateral movement. The movement will be applied each frame
   void startMoving(float acceleration) { accelerationX = acceleration; }
 
-  // Stops lateral movement
+  // Stops lateral acceleration
   void haltMovement() { accelerationX = 0.0; }
+
+  // Sets time until next stumble
+  void setStumbleTimer(float time = 0.0);
+
+  // Instantly apply speed in a random direction, and set up next stumble
+  void stumble(float frameTime);
 
   // Move player to the side
   void movePlayer(int offset);
 
   // SDL Wrapper instance
   SDLWrapper sdl;
+
+  // Random generator engine
+  std::default_random_engine randomGenerator{ (unsigned)time(NULL) };
 
   // Defines if the main game loop is ongoing
   bool gameActive{ false };
@@ -70,6 +96,9 @@ private:
 
   // Amount of speed the player is gaining on the x axis
   float accelerationX{ 0.0 };
+
+  // Time remaining until next stumble, in seconds
+  float stumbleTimer;
 };
 
 #endif

@@ -4,7 +4,18 @@
 #include <iostream>
 #include "../include/game.hpp"
 
-int clampMirrored(int a, int b) {
+// Clamp a given speed to boundaries set by playerMoveSpeedCap
+#define CLAMP_SPEED(speed) std::clamp((float)(speed), -playerMoveSpeedCap, playerMoveSpeedCap)
+
+static std::uniform_real_distribution<double> makeDistribution(float average, float standardDeviation) {
+  // Set up random interval
+  return std::uniform_real_distribution<double>(
+    average - standardDeviation,
+    average + standardDeviation
+    );
+}
+
+static int clampMirrored(int a, int b) {
   return std::clamp(a, -b / 2, b / 2);
 }
 
@@ -23,13 +34,13 @@ void Game::eventHandler(SDL_Event& event) {
 
     // std::cout << "Hit" << std::endl;
     switch (event.key.keysym.sym) {
-      // Stumble left
+      // Move left
     case SDLK_a:
     case SDLK_LEFT:
       startMoving(-playerMoveAcceleration);
       break;
 
-      // Stumble right
+      // Move right
     case SDLK_d:
     case SDLK_RIGHT:
       startMoving(playerMoveAcceleration);
@@ -65,11 +76,7 @@ void Game::applyMovement(float frameTime) {
   // Lateral acceleration
   if (accelerationX) {
     // std::cout << accelerationX * frameTime << std::endl;
-    speedX = std::clamp(
-      speedX + accelerationX * frameTime,
-      -playerMoveSpeedCap,
-      playerMoveSpeedCap
-    );
+    speedX = CLAMP_SPEED(speedX + accelerationX * frameTime);
   }
   // If no acceleration, start halting (as long as player is still moving)
   else if (speedX) {
@@ -98,12 +105,54 @@ void Game::movePlayer(int offset) {
   playerX = clampMirrored(playerX + offset, sideWalkWidth);
 }
 
+// Sets time until next stumble
+void Game::setStumbleTimer(float time) {
+  // If a valid time was provided, we stick to it
+  if (time > 0.0) {
+    stumbleTimer = time;
+    return;
+  }
+
+  // Sets up random interval
+  auto distribution = makeDistribution(averageStumbleInterval, stumbleIntervalStandardDeviation);
+
+  // Sets a lower boundary
+  stumbleTimer = std::max(distribution(randomGenerator), 0.2);
+  // std::cout << stumbleTimer << std::endl;
+}
+
+void Game::stumble(float frameTime) {
+  // Discount elapsed time from stumble timer
+  stumbleTimer -= frameTime;
+
+  // If timer ticks, stumble!
+  if (stumbleTimer <= 0.0) {
+    // Set up next stumble
+    setStumbleTimer();
+
+    // Set up random interval
+    auto distribution = makeDistribution(averageStumbleIntensity, stumbleIntensityStandardDeviation);
+
+    // Get stumble speed
+    auto stumbleSpeed = distribution(randomGenerator);
+
+    // Get a stumble direction
+    auto stumbleDirection = (randomGenerator() % 2 == 0) ? 1 : -1;
+
+    // Apply stumble speed
+    speedX = CLAMP_SPEED(speedX + stumbleSpeed * stumbleDirection);
+  }
+}
+
 void Game::startGame() {
   // Open window
   sdl.openWindow();
 
   // Set game loop to true
   gameActive = true;
+
+  // Set off player stumbling
+  setStumbleTimer(2.0);
 
   // Initialize game loop
   while (gameActive) {
@@ -116,6 +165,9 @@ void Game::startGame() {
 
     // Update player movement
     applyMovement(frameTime);
+
+    // Handles random stumbling
+    stumble(frameTime);
 
     // Update camera to player position
     sdl.setCamera(playerX, playerProgress);
