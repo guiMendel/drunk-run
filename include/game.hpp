@@ -59,7 +59,7 @@ private:
 
   // Updates the player position on the world based on it's speed
   // frameTime makes movement framerate-independent
-  void applyMovement(float frameTime);
+  void applyMovement();
 
   // Sets lateral movement. The movement will be applied each frame
   void startMoving(float acceleration) { accelerationX = acceleration; }
@@ -71,7 +71,7 @@ private:
   void setStumbleTimer(float time = 0.0);
 
   // Instantly apply speed in a random direction, and set up next stumble
-  void stumble(float frameTime);
+  void stumble();
 
   // Move player to the side
   void movePlayer(int offset);
@@ -81,6 +81,9 @@ private:
 
   // Random generator engine
   std::default_random_engine randomGenerator{ (unsigned)time(NULL) };
+
+  // Indicates the amount of time elapsed from last frame to this frame, in seconds
+  float frameTime;
 
   // Defines if the main game loop is ongoing
   bool gameActive{ false };

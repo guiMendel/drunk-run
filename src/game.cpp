@@ -72,7 +72,7 @@ void Game::eventHandler(SDL_Event& event) {
   }
 }
 
-void Game::applyMovement(float frameTime) {
+void Game::applyMovement() {
   // Lateral acceleration
   if (accelerationX) {
     // std::cout << accelerationX * frameTime << std::endl;
@@ -121,7 +121,7 @@ void Game::setStumbleTimer(float time) {
   // std::cout << stumbleTimer << std::endl;
 }
 
-void Game::stumble(float frameTime) {
+void Game::stumble() {
   // Discount elapsed time from stumble timer
   stumbleTimer -= frameTime;
 
@@ -157,17 +157,17 @@ void Game::startGame() {
   // Initialize game loop
   while (gameActive) {
     // Get elapsed frame time
-    float frameTime = sdl.elapsedTime() / 1000.0;
+    frameTime = sdl.elapsedTime() / 1000.0;
     // std::cout << frameTime << std::endl;
 
     // Handle input
     handleUserInput();
 
     // Update player movement
-    applyMovement(frameTime);
+    applyMovement();
 
     // Handles random stumbling
-    stumble(frameTime);
+    stumble();
 
     // Update camera to player position
     sdl.setCamera(playerX, playerProgress);
