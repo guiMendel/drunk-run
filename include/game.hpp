@@ -20,8 +20,16 @@ public:
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
 
-  // Speed in which player moves ahead
+  //////// Forward Movement
+
+  // Starting speed in which player moves ahead
   static const int playerAdvanceSpeed = 1000;
+
+  // Speed gained at each speed-up frame
+  static const int playerAdvanceSpeedUp = 100;
+
+  // Interval between speed-up frames, in seconds
+  static constexpr float playerAdvanceSpeedUpRate = 1.0;
 
   //////// Lateral Movement
 
@@ -73,6 +81,9 @@ private:
   // Instantly apply speed in a random direction, and set up next stumble
   void stumble();
 
+  // Handles which frame to apply speed-up
+  void speedUp();
+
   // Move player to the side
   void movePlayer(int offset);
 
@@ -100,8 +111,14 @@ private:
   // Amount of speed the player is gaining on the x axis
   float accelerationX{ 0.0 };
 
+  // Amount of units per second the player is moving on the z axis
+  float speedZ{ playerAdvanceSpeed };
+
   // Time remaining until next stumble, in seconds
   float stumbleTimer;
+
+  // Time remaining until next speed-up, in seconds
+  float speedUpTimer;
 };
 
 #endif

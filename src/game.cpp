@@ -96,7 +96,7 @@ void Game::applyMovement() {
   if (speedX) movePlayer(speedX * frameTime);
 
   // Frontal movement
-  playerProgress += (playerAdvanceSpeed * frameTime);
+  playerProgress += (speedZ * frameTime);
 }
 
 void Game::movePlayer(int offset) {
@@ -144,6 +144,21 @@ void Game::stumble() {
   }
 }
 
+void Game::speedUp() {
+  // Discount elapsed time from speed up timer
+  speedUpTimer -= frameTime;
+
+  // If timer ticks, speed up!
+  if (speedUpTimer <= 0.0) {
+    // Set up next speed up
+    speedUpTimer = playerAdvanceSpeedUpRate;
+
+    // Apply speed up
+    speedZ += playerAdvanceSpeedUp;
+    // std::cout << speedZ << std::endl;
+  }
+}
+
 void Game::startGame() {
   // Open window
   sdl.openWindow();
@@ -153,6 +168,9 @@ void Game::startGame() {
 
   // Set off player stumbling
   setStumbleTimer(2.0);
+
+  // Set off speed ups
+  speedUpTimer = 2.0;
 
   // Initialize game loop
   while (gameActive) {
@@ -166,8 +184,11 @@ void Game::startGame() {
     // Update player movement
     applyMovement();
 
-    // Handles random stumbling
+    // Handle random stumbling
     stumble();
+
+    // Handle player speed up
+    speedUp();
 
     // Update camera to player position
     sdl.setCamera(playerX, playerProgress);
