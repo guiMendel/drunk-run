@@ -4,8 +4,8 @@
 #include <iostream>
 #include "../include/game.hpp"
 
-// Clamp a given speed to boundaries set by playerMoveSpeedCap
-#define CLAMP_SPEED(speed) std::clamp((float)(speed), -playerMoveSpeedCap, playerMoveSpeedCap)
+// Clamp a given speed to boundaries set by moveSpeedCap
+#define CLAMP_SPEED(speed) std::clamp((float)(speed), -moveSpeedCap, moveSpeedCap)
 
 static std::uniform_real_distribution<double> makeDistribution(float average, float standardDeviation) {
   // Set up random interval
@@ -37,13 +37,13 @@ void Game::eventHandler(SDL_Event& event) {
       // Move left
     case SDLK_a:
     case SDLK_LEFT:
-      startMoving(-playerMoveAcceleration);
+      startMoving(-moveAcceleration);
       break;
 
       // Move right
     case SDLK_d:
     case SDLK_RIGHT:
-      startMoving(playerMoveAcceleration);
+      startMoving(moveAcceleration);
       break;
 
       // Toggle wireframes
@@ -83,7 +83,7 @@ void Game::applyMovement() {
     // Get move direction
     short direction = speedX > 0 ? 1 : -1;
     // Reduce speed
-    float speed = std::max(std::abs(speedX) - playerHaltAcceleration * frameTime, (float)0.0);
+    float speed = std::max(std::abs(speedX) - haltAcceleration * frameTime, (float)0.0);
     // Restore direction
     speedX = speed * direction;
   }
@@ -151,10 +151,10 @@ void Game::speedUp() {
   // If timer ticks, speed up!
   if (speedUpTimer <= 0.0) {
     // Set up next speed up
-    speedUpTimer = playerAdvanceSpeedUpRate;
+    speedUpTimer = speedUpRate;
 
     // Apply speed up
-    speedZ += playerAdvanceSpeedUp;
+    speedZ += speedUpAmount;
     // std::cout << speedZ << std::endl;
   }
 }

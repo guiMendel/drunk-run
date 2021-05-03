@@ -23,22 +23,22 @@ public:
   //////// Forward Movement
 
   // Starting speed in which player moves ahead
-  static const int playerAdvanceSpeed = 1000;
+  static const int advanceSpeed = 1000;
 
   // Speed gained at each speed-up frame
-  static const int playerAdvanceSpeedUp = 100;
+  static const int speedUpAmount = 100;
 
   // Interval between speed-up frames, in seconds
-  static constexpr float playerAdvanceSpeedUpRate = 1.0;
+  static constexpr float speedUpRate = 1.0;
 
   //////// Lateral Movement
 
   // Speed cap for player's lateral movement
-  static constexpr float playerMoveSpeedCap = 2400.0;
+  static constexpr float moveSpeedCap = 2400.0;
   // Acceleration for player's lateral movement
-  static constexpr float playerMoveAcceleration = 7000.0;
+  static constexpr float moveAcceleration = 7000.0;
   // Acceleration for player's lateral halting
-  static constexpr float playerHaltAcceleration = 2000.0;
+  static constexpr float haltAcceleration = 2000.0;
 
   //////// Stumbles
 
@@ -112,7 +112,7 @@ private:
   float accelerationX{ 0.0 };
 
   // Amount of units per second the player is moving on the z axis
-  float speedZ{ playerAdvanceSpeed };
+  float speedZ{ advanceSpeed };
 
   // Time remaining until next stumble, in seconds
   float stumbleTimer;
