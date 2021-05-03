@@ -7,7 +7,8 @@
 #include <stdexcept>
 #include <cstdint>
 #include <iostream>
-#include <list>
+#include <deque>
+#include <utility>
 
 // Config params
 
@@ -33,6 +34,10 @@ struct Obstacle {
   int height;
   // Z position of this obstacle (frontal face)
   int z;
+
+  Obstacle(int bottomLeft, int width, int height, int z) :
+    bottomLeft(bottomLeft), width(width), height(height), z(z) {
+  }
 };
 
 // Wrapper for SDL
@@ -65,15 +70,17 @@ public:
   void resolveEvents(void(*eventHandler)(void*, SDL_Event&), void*);
 
   // Update camera position
-  void setCamera(int x, float z) { cameraX = x; cameraZ = z; }
+  void setCamera(int x, float z);
 
   // Renders a new frame
   void renderFrame();
 
   //////////////////////// OBSTACLE INTERFACE
 
-  // Create a new obstacle
-  void newObstacle(int bottomLeft, int width, int height, int distance);
+  // Create a new obstacle and add it to the queue
+  // Passes all arguments directly to obstacle's constructor
+  template <typename... Args>
+  void newObstacle(Args&&... args) { obstacles.push_back(std::make_unique<Obstacle>(std::forward<Args>(args)...)); }
 
   // Toggles between drawing wireframes or filled cubes
   void toggleWireframe() { wireframesOnly = !wireframesOnly; }
@@ -94,6 +101,11 @@ public:
   }
 
 private:
+  //////////////////////// LOGIC
+
+  // Verifies if camera is colliding in this frame with the front obstacle in the deque 
+  void collisionCheck(); // TODO
+  
   //////////////////////// GEOMETRY
 
   // Applies perspective to a point
@@ -115,7 +127,7 @@ private:
   SDL_Rect makeRect(int bottomLeft, int width, int height, int distance);
 
   // Draws a rectangle relative to it's distance from screen
-  void drawObstacle(int bottomLeft, int width, int height, int distance);
+  void drawObstacle(Obstacle& obstacle);
 
   // Draw the sides of an obstacle
   void drawSides(int bottomLeft, int width, int height, int distance);
@@ -128,8 +140,8 @@ private:
 
   //////////////////////// MUTABLE STATE
 
-  // List of all active obstacles
-  std::list<Obstacle> obstacles;
+  // Deque of all active obstacles, ordered in Z position
+  std::deque<std::unique_ptr<Obstacle>> obstacles;
 
   // If turned on, draws only wireframes
   bool wireframesOnly{ false };

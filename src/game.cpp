@@ -172,6 +172,18 @@ void Game::startGame() {
   // Set off speed ups
   speedUpTimer = 2.0;
 
+  // Render rect
+  sdl.newObstacle(-400, 300, 1200, 3000);
+
+  // Render rect
+  sdl.newObstacle(-50, 100, 200, 4800);
+
+  // Render rect
+  sdl.newObstacle(300, 200, 700, 6500);
+  
+  // Render rect
+  sdl.newObstacle(-350, 500, 1000, 10000);
+
   // Initialize game loop
   while (gameActive) {
     // Get elapsed frame time
