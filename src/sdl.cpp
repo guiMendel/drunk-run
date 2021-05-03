@@ -111,7 +111,7 @@ void SDLWrapper::drawObstacle(int bottomLeft, int width, int height, int distanc
   }
 }
 
-void SDLWrapper::drawShapes() {
+void SDLWrapper::renderFrame() {
   // Get renderer pointer
   auto rendererPtr = renderer.get();
 
@@ -121,10 +121,6 @@ void SDLWrapper::drawShapes() {
 
   // Draw floor
   drawFloor();
-
-  // //Render outlined quad
-  // SDL_Rect outlineRect = { x(-200), y(200), 400, 400 };
-  // SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
   // Render rect
   drawObstacle(-350, 500, 1000, 10000);
@@ -137,15 +133,6 @@ void SDLWrapper::drawShapes() {
 
   // Render rect
   drawObstacle(-400, 300, 1200, 3000);
-
-  // Render rect
-  // drawObstacle(300, 300, 800, 6000);
-
-  // //Draw blue horizontal line
-  // SDL_RenderDrawLine(rendererPtr, 0, screenHeight / 2, screenWidth, screenHeight / 2);
-
-  // // Draw dot
-  // SDL_RenderDrawPoint(rendererPtr, x(0), y(100));
 
   //Update screen
   SDL_RenderPresent(rendererPtr);

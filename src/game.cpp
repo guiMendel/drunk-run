@@ -193,6 +193,6 @@ void Game::startGame() {
     // Update camera to player position
     sdl.setCamera(playerX, playerProgress);
 
-    sdl.drawShapes();
+    sdl.renderFrame();
   }
 }

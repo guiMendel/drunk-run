@@ -56,8 +56,8 @@ public:
 
   //////////////////////// GEOMETRY
 
-  // Draw some random shapes (MEANT FOR TESTING)
-  void drawShapes();
+  // Renders a new frame
+  void renderFrame();
 
   // Draws a rectangle relative to it's distance from screen
   void drawObstacle(int bottomLeft, int width, int height, int distance);
