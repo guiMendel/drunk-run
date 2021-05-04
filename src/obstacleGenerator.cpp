@@ -19,5 +19,5 @@ void ObstacleGenerator::generate(int z) {
   auto bottomLeft = distribution(randomGenerator);
 
   // Generate obstacle
-  sdl.newObstacle(bottomLeft, shape.width, shape.height, z);
+  sdl.newObstacle(bottomLeft, shape.width, shape.height, shape.depth, z);
 }

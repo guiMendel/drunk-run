@@ -13,6 +13,8 @@ struct ObstacleShape {
   int width;
   // Height of obstacle
   int height;
+  // Depth of the obstacle
+  int depth;
 };
 
 // Responsible for obstacle creation timing and procedure
@@ -28,15 +30,15 @@ public:
   // Possible obstacle shapes
   static constexpr ObstacleShape allowedShapes[TOTAL_SHAPES] = {
     // {width, height}
-    {300, 1400},
-    {300, 1300},
-    {300, 1200},
-    {300, 1100},
-    {70, 70},
-    {40, 70},
-    {50, 20},
-    {70, 5000},
-    {500, 400}
+    {350, 1300, 400},
+    {250, 1300, 400},
+    {300, 1200, 400},
+    {300, 1100, 400},
+    {70, 70, 90},
+    {40, 70, 100},
+    {50, 20, 120},
+    {70, 5000, 70},
+    {500, 400, 120}
   };
 
   //////////////////////// INTERFACE

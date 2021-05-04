@@ -52,7 +52,7 @@ SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width, int height, int distanc
     });
 }
 
-void SDLWrapper::drawSides(int bottomLeft, int width, int height, int distance) {
+void SDLWrapper::drawSides(int bottomLeft, int width, int height, int depth, int z) {
   const int startingY = -(screenHeight / 2) + 5;
   const int finalY = -(screenHeight / 2) + height;
   const int startingX = bottomLeft;
@@ -62,10 +62,10 @@ void SDLWrapper::drawSides(int bottomLeft, int width, int height, int distance) 
   SDL_SetRenderDrawColor(renderer.get(), OBSTACLE_COLOR);
 
   // Draw edges
-  drawEdge(startingX, startingY, distance);
-  drawEdge(startingX, finalY, distance);
-  drawEdge(finalX, finalY, distance);
-  drawEdge(finalX, startingY, distance);
+  drawEdge(startingX, startingY, z, depth);
+  drawEdge(startingX, finalY, z, depth);
+  drawEdge(finalX, finalY, z, depth);
+  drawEdge(finalX, startingY, z, depth);
 
   // Draw filled sides
   if (!wireframesOnly) {
@@ -75,23 +75,23 @@ void SDLWrapper::drawSides(int bottomLeft, int width, int height, int distance) 
     // Draw left and right sides
     for (int y = startingY + 1; y < finalY; y++) {
       // Left
-      drawEdge(startingX, y, distance);
+      drawEdge(startingX, y, z, depth);
       // Right
-      drawEdge(finalX, y, distance);
+      drawEdge(finalX, y, z, depth);
     }
 
     // Draw top side
-    for (int x = startingX + 1; x < finalX; x++) drawEdge(x, finalY, distance);
+    for (int x = startingX + 1; x < finalX; x++) drawEdge(x, finalY, z, depth);
   }
 }
 
-void SDLWrapper::drawEdge(int pointX, int pointY, int distance) {
+void SDLWrapper::drawEdge(int pointX, int pointY, int z, int depth) {
   SDL_RenderDrawLine(
     renderer.get(),
-    x(perspective(pointX, distance, AXIS_X)),
-    y(perspective(pointY, distance, AXIS_Y)),
-    x(perspective(pointX, distance + OBSTACLE_DEPTH, AXIS_X)),
-    y(perspective(pointY, distance + OBSTACLE_DEPTH, AXIS_Y))
+    x(perspective(pointX, z, AXIS_X)),
+    y(perspective(pointY, z, AXIS_Y)),
+    x(perspective(pointX, z + depth, AXIS_X)),
+    y(perspective(pointY, z + depth, AXIS_Y))
   );
 }
 
@@ -106,7 +106,7 @@ void SDLWrapper::drawObstacle(Obstacle& obstacle) {
   auto rendererPtr = renderer.get();
 
   // Draw sides
-  drawSides(obstacle.bottomLeft, obstacle.width, obstacle.height, distance);
+  drawSides(obstacle.bottomLeft, obstacle.width, obstacle.height, obstacle.depth, distance);
 
   // Paint color
   SDL_SetRenderDrawColor(rendererPtr, OBSTACLE_COLOR);
@@ -121,7 +121,7 @@ void SDLWrapper::drawObstacle(Obstacle& obstacle) {
     SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
     // Draw back face
-    outlineRect = makeRect(obstacle.bottomLeft, obstacle.width, obstacle.height, distance + OBSTACLE_DEPTH);
+    outlineRect = makeRect(obstacle.bottomLeft, obstacle.width, obstacle.height, distance + obstacle.depth);
     SDL_RenderDrawRect(rendererPtr, &outlineRect);
   }
 }

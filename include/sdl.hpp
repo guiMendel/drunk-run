@@ -14,7 +14,6 @@
 // Config params
 
 #define CAMERA_HEIGHT 650
-#define OBSTACLE_DEPTH 500
 
 #define OBSTACLE_COLOR 0x00, 0x00, 0x00, 0xFF
 #define OBSTACLE_SIDE_COLOR 0x33, 0x33, 0x33, 0xFF
@@ -115,10 +114,10 @@ private:
   void drawObstacle(Obstacle& obstacle);
 
   // Draw the sides of an obstacle
-  void drawSides(int bottomLeft, int width, int height, int distance);
+  void drawSides(int bottomLeft, int width, int height, int depth, int z);
 
   // Draw a line from a point to it's corresponding depth
-  void drawEdge(int pointX, int pointY, int distance);
+  void drawEdge(int pointX, int pointY, int z, int depth);
 
   // Draw the borders of the ground
   void drawFloor();
