@@ -48,14 +48,14 @@ public:
   //////// Stumbling
 
   // Time average between random player stumbles, in seconds
-  static constexpr float averageStumbleInterval = 1.5;
+  static constexpr float averageStumbleInterval = 2.5;
   // Standard deviation for stumble intervals
-  static constexpr float stumbleIntervalStandardDeviation = 1.0;
+  static constexpr float stumbleIntervalStandardDeviation = 1.5;
 
   // Average intensity of random stumbles, in speed
-  static constexpr float averageStumbleIntensity = 1300.0;
+  static constexpr float averageStumbleIntensity = 800.0;
   // Standard deviation for stumble intensity
-  static constexpr float stumbleIntensityStandardDeviation = 800.0;
+  static constexpr float stumbleIntensityStandardDeviation = 500.0;
 
   //////////////////////// GAME
 
