@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include "../include/game.hpp"
+#include "../include/obstacleGenerator.hpp"
 
 // Clamp a given speed to boundaries set by moveSpeedCap
 #define CLAMP_SPEED(speed) std::clamp((float)(speed), -moveSpeedCap, moveSpeedCap)
@@ -88,7 +89,7 @@ void Game::applyMovement() {
   if (speedX) movePlayer(speedX * frameTime);
 
   // Frontal movement
-  playerProgress += (speedZ * frameTime);
+  playerProgress += (int)(speedZ * frameTime);
 }
 
 void Game::movePlayer(int offset) {
@@ -148,18 +149,17 @@ void Game::speedUp() {
   }
 }
 
+void Game::generateObstacles() {
+
+}
+
+
 void Game::startGame() {
   // Open window
   sdl.openWindow();
 
   // Set game loop to true
   gameActive = true;
-
-  // Set off player stumbling
-  setStumbleTimer(2.0);
-
-  // Set off speed ups
-  speedUpTimer = 2.0;
 
   // Render rect
   sdl.newObstacle(-400, 300, 1200, 3000);
@@ -193,6 +193,9 @@ void Game::startGame() {
 
     // Update camera to player position
     sdl.setCamera(playerX, playerProgress);
+
+    // Procedural obstacle generation
+    generateObstacles();
 
     sdl.renderFrame();
   }

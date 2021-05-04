@@ -4,7 +4,7 @@
 
 #define GROUND_Y height - (screenHeight / 2)
 
-void SDLWrapper::setCamera(int x, float z) {
+void SDLWrapper::setCamera(int x, int z) {
   cameraX = x;
   cameraZ = z;
 

@@ -55,7 +55,7 @@ public:
   void resolveEvents(void(*eventHandler)(void*, SDL_Event&), void*);
 
   // Update camera position
-  void setCamera(int x, float z);
+  void setCamera(int x, int z);
 
   // Renders a new frame
   void renderFrame();
@@ -135,7 +135,7 @@ private:
   Uint32 timeStick{ 0 };
 
   // Camera z position
-  float cameraZ{ 0.0 };
+  int cameraZ{ 0 };
 
   // Camera x position
   int cameraX{ 0 };

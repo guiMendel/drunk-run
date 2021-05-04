@@ -21,6 +21,13 @@ public:
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
 
+  //////// Obstacles
+
+  // Average distance between obstacles
+  static const int averageObstacleSpacing = 200;
+  // Standard deviation for distance between obstacles
+  static const int obstacleSpacingStandardDeviation = 100;
+
   //////// Forward Movement
 
   // Starting speed in which player moves ahead
@@ -59,6 +66,9 @@ public:
 
   // Opens window and starts main game loop
   void startGame();
+
+  // Handles interaction with obstacleGenerator class
+  void generateObstacles();
 
   //////////////////////// SDL INTERACTION
 
@@ -116,7 +126,7 @@ private:
   float frameTime;
 
   // Amount of units the player has advanced
-  float playerProgress{ 0.0 };
+  int playerProgress{ 0 };
 
   // Amount of units the player is offset on the x axis
   int playerX{ 0 };
@@ -131,10 +141,13 @@ private:
   float speedZ{ advanceSpeed };
 
   // Time remaining until next stumble, in seconds
-  float stumbleTimer;
+  float stumbleTimer{ averageStumbleInterval };
 
   // Time remaining until next speed-up, in seconds
-  float speedUpTimer;
+  float speedUpTimer{ speedUpRate };
+
+  // When player reaches this Z position, it's time to generate a new obstacle
+  int nextObstacleAt{ averageObstacleSpacing };
 
   //////////////////////// CONSTANT STATE
 

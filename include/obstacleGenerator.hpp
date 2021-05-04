@@ -3,17 +3,11 @@
 
 #include <random>
 #include "obstacle.hpp"
+#include "game.hpp"
 
 // Responsible for obstacle creation timing and procedure
 class ObstacleGenerator {
 public:
-  //////////////////////// CONFIG
-
-  // Average distance between obstacles
-  static const int averageObstacleSpacing = 200;
-  // Standard deviation for distance between obstacles
-  static const int obstacleSpacingStandardDeviation = 100;
-
   //////////////////////// INTERFACE
 
   // Initialize random engine
@@ -22,7 +16,7 @@ public:
   }
 
   // Return the spacing to be covered before creating the next obstacle
-  int getSpacing() { return randomInt(averageObstacleSpacing, obstacleSpacingStandardDeviation); }
+  int getSpacing() { return randomInt(Game::averageObstacleSpacing, Game::obstacleSpacingStandardDeviation); }
 
   // Generates properties for a new obstacle and create it throught the SDL Wrapper
   // It's Z position must be provided
