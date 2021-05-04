@@ -23,15 +23,15 @@ public:
   static const int sideWalkWidth = 2400;
 
   // Distance in which new obstacles are generated
-  static const int depthOfView = 10000;
+  static const int depthOfView = 50000;
 
   //////// Forward Movement
 
   // Starting speed in which player moves ahead
-  static const int advanceSpeed = 1000;
+  static const int advanceSpeed = 2000;
 
   // Speed gained at each speed-up frame
-  static const int speedUpAmount = 100;
+  static const int speedUpAmount = 200;
 
   // Interval between speed-up frames, in seconds
   static constexpr float speedUpRate = 1.0;
@@ -39,9 +39,9 @@ public:
   //////// Lateral Movement
 
   // Speed cap for player's lateral movement
-  static constexpr float moveSpeedCap = 2400.0;
+  static constexpr float moveSpeedCap = 3000.0;
   // Acceleration for player's lateral movement
-  static constexpr float moveAcceleration = 7000.0;
+  static constexpr float moveAcceleration = 15000.0;
   // Acceleration for player's lateral halting
   static constexpr float haltAcceleration = 2000.0;
 
@@ -64,16 +64,27 @@ public:
   // Opens window and starts main game loop
   void startGame();
 
-  // Handles interaction with obstacleGenerator class
-  void generateObstacles();
-
   //////////////////////// SDL INTERACTION
 
   // Function that takes an SDL event and resolves it
   void eventHandler(SDL_Event& event);
 
 private:
+  //////////////////////// GAME
+
+  // Generates a new obstacle. The parameter indicates it's distance from the player
+  void generateObstacle(int relativeZ) { obstacleGenerator.generate(relativeZ + playerProgress); }
+
+  // Handles interaction with obstacleGenerator class
+  void handleObstacles();
+
+  // Generates obstacles from player's position until his relative DoV
+  void generateInitialObstacles();
+
   //////////////////////// HELPERS
+
+  // Return DoV relative to player's position
+  int currentDepthOfView() { return depthOfView + playerProgress; }
 
   float randomFloat(float average, float standardDeviation) {
     // Set up random interval

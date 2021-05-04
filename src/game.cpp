@@ -126,7 +126,7 @@ void Game::stumble() {
     auto stumbleSpeed = randomFloat(averageStumbleIntensity, stumbleIntensityStandardDeviation);
 
     // Get a stumble direction
-    auto stumbleDirection = (randomGenerator() % 2 == 0) ? 1 : -1;
+    auto stumbleDirection = (randomGenerator() % 2 == 1) ? 1 : -1;
 
     // Apply stumble speed
     speedX = CLAMP_SPEED(speedX + stumbleSpeed * stumbleDirection);
@@ -148,19 +148,33 @@ void Game::speedUp() {
   }
 }
 
-void Game::generateObstacles() {
+void Game::handleObstacles() {
   // Verify if player has advanced enough for game to generate more obstacles
   while (nextObstacleZ <= playerProgress) {
     // Generate this obstacle
-    obstacleGenerator.generate(depthOfView + playerProgress);
+    obstacleGenerator.generate(currentDepthOfView());
 
     // Get next obstacle Z
     nextObstacleZ += obstacleGenerator.getSpacing();
-
-    // std::cout << nextObstacleZ << std::endl;
   }
 }
 
+void Game::generateInitialObstacles() {
+  // Indicates the position of the next obstacle to be generated
+  int obstaclePin = nextObstacleZ;
+
+  // Store current DoV
+  const int DoV = currentDepthOfView();
+
+  // Keeps generating until generation reaches DoV
+  while (obstaclePin <= DoV) {
+    // Generate this obstacle
+    obstacleGenerator.generate(obstaclePin);
+
+    // Get next obstacle Z
+    obstaclePin += obstacleGenerator.getSpacing();
+  }
+}
 
 void Game::startGame() {
   // Open window
@@ -169,17 +183,8 @@ void Game::startGame() {
   // Set game loop to true
   gameActive = true;
 
-  // Render rect
-  sdl.newObstacle(-400, 300, 1200, 3000);
-
-  // Render rect
-  sdl.newObstacle(-50, 100, 200, 4800);
-
-  // Render rect
-  sdl.newObstacle(300, 200, 700, 6500);
-
-  // Render rect
-  sdl.newObstacle(-350, 500, 1000, 10000);
+  // Initialize obstacles
+  generateInitialObstacles();
 
   // Initialize game loop
   while (gameActive) {
@@ -203,8 +208,9 @@ void Game::startGame() {
     sdl.setCamera(playerX, playerProgress);
 
     // Procedural obstacle generation
-    generateObstacles();
+    handleObstacles();
 
+    // Render the game screen frame
     sdl.renderFrame();
   }
 }

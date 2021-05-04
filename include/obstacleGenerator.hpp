@@ -5,7 +5,7 @@
 #include "obstacle.hpp"
 #include "sdl.hpp"
 
-#define TOTAL_SHAPES 3
+#define TOTAL_SHAPES 9
 
 // Prefabs for obstacle shapes
 struct ObstacleShape {
@@ -28,9 +28,15 @@ public:
   // Possible obstacle shapes
   static constexpr ObstacleShape allowedShapes[TOTAL_SHAPES] = {
     // {width, height}
-    {300, 800},
-    {50, 50},
-    {500, 600}
+    {300, 1400},
+    {300, 1300},
+    {300, 1200},
+    {300, 1100},
+    {70, 70},
+    {40, 70},
+    {50, 20},
+    {70, 5000},
+    {500, 400}
   };
 
   //////////////////////// INTERFACE
