@@ -5,6 +5,7 @@
 #include <random>
 #include <ctime>
 #include "sdl.hpp"
+#include "obstacleGenerator.hpp"
 
 // Wraps eventHandler method into a function, provided the object's pointer
 void eventHandlerWrapper(void* context, SDL_Event& event);
@@ -20,13 +21,6 @@ public:
 
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
-
-  //////// Obstacles
-
-  // Average distance between obstacles
-  static const int averageObstacleSpacing = 200;
-  // Standard deviation for distance between obstacles
-  static const int obstacleSpacingStandardDeviation = 100;
 
   //////// Forward Movement
 
@@ -62,7 +56,7 @@ public:
 
   //////////////////////// GAME
 
-  Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth) {}
+  Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth), obstacleGenerator(randomGenerator) {}
 
   // Opens window and starts main game loop
   void startGame();
@@ -147,15 +141,18 @@ private:
   float speedUpTimer{ speedUpRate };
 
   // When player reaches this Z position, it's time to generate a new obstacle
-  int nextObstacleAt{ averageObstacleSpacing };
+  int nextObstacleZ{ ObstacleGenerator::averageObstacleSpacing };
 
   //////////////////////// CONSTANT STATE
+
+  // Random generator engine
+  std::default_random_engine randomGenerator{ (unsigned)time(NULL) };
 
   // SDL Wrapper instance
   SDLWrapper sdl;
 
-  // Random generator engine
-  std::default_random_engine randomGenerator{ (unsigned)time(NULL) };
+  // Obstacle generator instance
+  ObstacleGenerator obstacleGenerator;
 };
 
 #endif

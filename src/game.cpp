@@ -3,7 +3,6 @@
 #include <cmath>
 #include <iostream>
 #include "../include/game.hpp"
-#include "../include/obstacleGenerator.hpp"
 
 // Clamp a given speed to boundaries set by moveSpeedCap
 #define CLAMP_SPEED(speed) std::clamp((float)(speed), -moveSpeedCap, moveSpeedCap)
@@ -150,7 +149,13 @@ void Game::speedUp() {
 }
 
 void Game::generateObstacles() {
+  // Verify if player has advanced enough for game to generate more obstacles
+  while (nextObstacleZ <= playerProgress) {
+    // Get next obstacle Z
+    nextObstacleZ += obstacleGenerator.getSpacing();
 
+    std::cout << nextObstacleZ << std::endl;
+  }
 }
 
 
