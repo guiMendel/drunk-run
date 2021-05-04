@@ -3,6 +3,17 @@
 
 #include <random>
 #include "obstacle.hpp"
+#include "sdl.hpp"
+
+#define TOTAL_SHAPES 3
+
+// Prefabs for obstacle shapes
+struct ObstacleShape {
+  // Width of obstacle
+  int width;
+  // Height of obstacle
+  int height;
+};
 
 // Responsible for obstacle creation timing and procedure
 class ObstacleGenerator {
@@ -14,11 +25,19 @@ public:
   // Standard deviation for distance between obstacles
   static const int obstacleSpacingStandardDeviation = 1000;
 
+  // Possible obstacle shapes
+  static constexpr ObstacleShape allowedShapes[TOTAL_SHAPES] = {
+    // {width, height}
+    {300, 800},
+    {50, 50},
+    {500, 600}
+  };
+
   //////////////////////// INTERFACE
 
-  // Initialize random engine
-  ObstacleGenerator(std::default_random_engine& randomGenerator)
-    : randomGenerator(randomGenerator) {
+  // Initialize random engine & sdl wrapper
+  ObstacleGenerator(std::default_random_engine& randomGenerator, SDLWrapper& sdl)
+    : randomGenerator(randomGenerator), sdl(sdl) {
   }
 
   // Return the spacing to be covered before creating the next obstacle
@@ -45,6 +64,9 @@ private:
 
   // Reference to game's random generator engine
   std::default_random_engine& randomGenerator;
+
+  // Reference to game's SDL Wrapper instance
+  SDLWrapper& sdl;
 };
 
 #endif

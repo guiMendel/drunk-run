@@ -22,6 +22,9 @@ public:
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
 
+  // Distance in which new obstacles are generated
+  static const int depthOfView = 10000;
+
   //////// Forward Movement
 
   // Starting speed in which player moves ahead
@@ -56,7 +59,7 @@ public:
 
   //////////////////////// GAME
 
-  Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth), obstacleGenerator(randomGenerator) {}
+  Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth), obstacleGenerator(randomGenerator, sdl) {}
 
   // Opens window and starts main game loop
   void startGame();

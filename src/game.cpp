@@ -151,10 +151,13 @@ void Game::speedUp() {
 void Game::generateObstacles() {
   // Verify if player has advanced enough for game to generate more obstacles
   while (nextObstacleZ <= playerProgress) {
+    // Generate this obstacle
+    obstacleGenerator.generate(depthOfView + playerProgress);
+
     // Get next obstacle Z
     nextObstacleZ += obstacleGenerator.getSpacing();
 
-    std::cout << nextObstacleZ << std::endl;
+    // std::cout << nextObstacleZ << std::endl;
   }
 }
 
