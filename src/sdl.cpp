@@ -123,12 +123,18 @@ void SDLWrapper::collisionCheck() {
 void SDLWrapper::gameOver() {
   auto rendererPtr = renderer.get();
 
-  Text text("Game Over", screenWidth/2 - 250, screenHeight/2 - 100, 200, 500);
+  Text text1("Game Over", screenWidth/2 - 250, screenHeight/2 - 150, 200, 500);
 
   SDL_Color yellow = SDL_Color{247, 216, 39, 255};
 
-  Font font("Fonts/game_over.ttf", 128, yellow);
-  font.RenderText(rendererPtr, text);
+  Font font1("Fonts/game_over.ttf", 128, yellow);
+  font1.RenderText(rendererPtr, text1);
+
+  Text text2("press q to exit", screenWidth/2 - 150, screenHeight/2 + 60, 80, 300);
+
+  SDL_Color white = SDL_Color{255, 255, 255, 255};
+  Font font2("Fonts/Roboto-Bold.ttf", 128, white);
+  font2.RenderText(rendererPtr, text2);
 }
 
 SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width, 
