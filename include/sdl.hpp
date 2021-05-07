@@ -154,6 +154,9 @@ private:
   // Camera x position
   int cameraX{ 0 };
 
+  // The final score
+  int m_score{0};
+
   //////////////////////// CONSTANT STATE
 
   // Simulated distance from eye to screen
