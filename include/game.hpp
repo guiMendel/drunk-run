@@ -28,7 +28,7 @@ public:
   static const int depthOfView = 50000;
 
   // Number of units correspondent to 1 meter
-  static const int unitsPerScore = 2000;
+  static const int unitsPerScore = 3000;
 
   //////// Forward Movement
 
@@ -66,6 +66,9 @@ public:
 
   // Player width, impacts his area of collision hurtbox
   static const int playerWidth = SCREEN_WIDTH / 2;
+
+  // Minimum height for an obstacle to be dangerous
+  static const int dangerousObstacleHeight = 200;
 
   //////////////////////// GAME
 

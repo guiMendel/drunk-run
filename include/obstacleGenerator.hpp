@@ -29,7 +29,7 @@ public:
 
   // Possible obstacle shapes
   static constexpr ObstacleShape allowedShapes[TOTAL_SHAPES] = {
-    // {width, height}
+    // {width, height, depth}
     {350, 1300, 400},
     {250, 1300, 400},
     {300, 1200, 400},

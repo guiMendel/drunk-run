@@ -79,8 +79,11 @@ void Game::collisionCheck() {
     int playerLeft = playerX - playerWidth / 2;
     int playerRight = playerX + playerWidth / 2;
 
-    // If the boundaries overlap
-    if ((obstacleRight > playerLeft) && (obstacleLeft < playerRight)) {
+    // If the obstacle has a dangerous height & boundaries overlap
+    if (
+      obstacle.height >= dangerousObstacleHeight &&
+      (obstacleRight > playerLeft) && (obstacleLeft < playerRight)
+      ) {
       // Collision is detected
       collide();
     }
