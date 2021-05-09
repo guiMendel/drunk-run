@@ -9,11 +9,13 @@ struct Obstacle {
   int width;
   // Height of obstacle
   int height;
+  // Depth of obstacle
+  int depth;
   // Z position of this obstacle (frontal face)
   int z;
 
-  Obstacle(int bottomLeft, int width, int height, int z) :
-    bottomLeft(bottomLeft), width(width), height(height), z(z) {
+  Obstacle(int bottomLeft, int width, int height, int depth, int z) :
+    bottomLeft(bottomLeft), width(width), height(height), depth(depth), z(z) {
   }
 };
 

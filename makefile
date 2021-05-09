@@ -25,7 +25,7 @@ COMPILATION_ARGS = $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS)
 ##################################################################################
 
 #DEPS header files
-_DEPS = sdl.hpp game.hpp obstacleGenerator.hpp text.hpp
+_DEPS = sdl.hpp game.hpp obstacleGenerator.hpp text.hpp obstacle.hpp
 DEPS = $(patsubst %,$(LOCAL_INCLUDE_PATH)/%,$(_DEPS))
 
 #OBJS specifies which files to compile as part of the project

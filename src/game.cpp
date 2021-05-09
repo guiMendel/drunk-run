@@ -27,12 +27,14 @@ void Game::eventHandler(SDL_Event& event) {
     // std::cout << "Hit" << std::endl;
     switch (event.key.keysym.sym) {
       // Move left
+    case SDLK_a:
     case SDLK_l:
     case SDLK_LEFT:
       startMoving(-moveAcceleration);
       break;
 
       // Move right
+    case SDLK_d:
     case SDLK_m:
     case SDLK_RIGHT:
       startMoving(moveAcceleration);
@@ -88,7 +90,7 @@ void Game::applyMovement() {
   if (speedX) movePlayer(speedX * frameTime);
 
   // Frontal movement
-  playerProgress += (speedZ * frameTime);
+  playerProgress += (int)(speedZ * frameTime);
 }
 
 void Game::movePlayer(int offset) {
@@ -126,7 +128,7 @@ void Game::stumble() {
     auto stumbleSpeed = randomFloat(averageStumbleIntensity, stumbleIntensityStandardDeviation);
 
     // Get a stumble direction
-    auto stumbleDirection = (randomGenerator() % 2 == 0) ? 1 : -1;
+    auto stumbleDirection = (randomGenerator() % 2 == 1) ? 1 : -1;
 
     // Apply stumble speed
     speedX = CLAMP_SPEED(speedX + stumbleSpeed * stumbleDirection);
@@ -148,6 +150,34 @@ void Game::speedUp() {
   }
 }
 
+void Game::handleObstacles() {
+  // Verify if player has advanced enough for game to generate more obstacles
+  while (nextObstacleZ <= playerProgress) {
+    // Generate this obstacle
+    obstacleGenerator.generate(currentDepthOfView());
+
+    // Get next obstacle Z
+    nextObstacleZ += obstacleGenerator.getSpacing();
+  }
+}
+
+void Game::generateInitialObstacles() {
+  // Indicates the position of the next obstacle to be generated
+  int obstaclePin = nextObstacleZ;
+
+  // Store current DoV
+  const int DoV = currentDepthOfView();
+
+  // Keeps generating until generation reaches DoV
+  while (obstaclePin <= DoV) {
+    // Generate this obstacle
+    obstacleGenerator.generate(obstaclePin);
+
+    // Get next obstacle Z
+    obstaclePin += obstacleGenerator.getSpacing();
+  }
+}
+
 void Game::startGame() {
   // Open window
   sdl.openWindow();
@@ -155,23 +185,8 @@ void Game::startGame() {
   // Set game loop to true
   gameActive = true;
 
-  // Set off player stumbling
-  setStumbleTimer(2.0);
-
-  // Set off speed ups
-  speedUpTimer = 2.0;
-
-  // Render rect
-  sdl.newObstacle(-400, 300, 1200, 3000);
-
-  // Render rect
-  sdl.newObstacle(-50, 100, 200, 4800);
-
-  // Render rect
-  sdl.newObstacle(300, 200, 700, 6500);
-
-  // Render rect
-  sdl.newObstacle(-350, 500, 1000, 10000);
+  // Initialize obstacles
+  generateInitialObstacles();
 
   // Initialize game loop
   while (gameActive) {
@@ -194,6 +209,10 @@ void Game::startGame() {
     // Update camera to player position
     sdl.setCamera(playerX, playerProgress);
 
+    // Procedural obstacle generation
+    handleObstacles();
+
+    // Render the game screen frame
     sdl.renderFrame(playerProgress/speedZ);
   }
 }

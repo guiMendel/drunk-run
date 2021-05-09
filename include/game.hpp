@@ -5,6 +5,7 @@
 #include <random>
 #include <ctime>
 #include "sdl.hpp"
+#include "obstacleGenerator.hpp"
 
 // Wraps eventHandler method into a function, provided the object's pointer
 void eventHandlerWrapper(void* context, SDL_Event& event);
@@ -21,13 +22,16 @@ public:
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
 
+  // Distance in which new obstacles are generated
+  static const int depthOfView = 50000;
+
   //////// Forward Movement
 
   // Starting speed in which player moves ahead
-  static const int advanceSpeed = 1000;
+  static const int advanceSpeed = 2000;
 
   // Speed gained at each speed-up frame
-  static const int speedUpAmount = 100;
+  static const int speedUpAmount = 200;
 
   // Interval between speed-up frames, in seconds
   static constexpr float speedUpRate = 1.0;
@@ -35,27 +39,27 @@ public:
   //////// Lateral Movement
 
   // Speed cap for player's lateral movement
-  static constexpr float moveSpeedCap = 2400.0;
+  static constexpr float moveSpeedCap = 3000.0;
   // Acceleration for player's lateral movement
-  static constexpr float moveAcceleration = 7000.0;
+  static constexpr float moveAcceleration = 15000.0;
   // Acceleration for player's lateral halting
   static constexpr float haltAcceleration = 2000.0;
 
   //////// Stumbling
 
   // Time average between random player stumbles, in seconds
-  static constexpr float averageStumbleInterval = 1.5;
+  static constexpr float averageStumbleInterval = 2.5;
   // Standard deviation for stumble intervals
-  static constexpr float stumbleIntervalStandardDeviation = 1.0;
+  static constexpr float stumbleIntervalStandardDeviation = 1.5;
 
   // Average intensity of random stumbles, in speed
-  static constexpr float averageStumbleIntensity = 1300.0;
+  static constexpr float averageStumbleIntensity = 800.0;
   // Standard deviation for stumble intensity
-  static constexpr float stumbleIntensityStandardDeviation = 800.0;
+  static constexpr float stumbleIntensityStandardDeviation = 500.0;
 
   //////////////////////// GAME
 
-  Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth) {}
+  Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth), obstacleGenerator(randomGenerator, sdl) {}
 
   // Opens window and starts main game loop
   void startGame();
@@ -66,7 +70,21 @@ public:
   void eventHandler(SDL_Event& event);
 
 private:
+  //////////////////////// GAME
+
+  // Generates a new obstacle. The parameter indicates it's distance from the player
+  void generateObstacle(int relativeZ) { obstacleGenerator.generate(relativeZ + playerProgress); }
+
+  // Handles interaction with obstacleGenerator class
+  void handleObstacles();
+
+  // Generates obstacles from player's position until his relative DoV
+  void generateInitialObstacles();
+
   //////////////////////// HELPERS
+
+  // Return DoV relative to player's position
+  int currentDepthOfView() { return depthOfView + playerProgress; }
 
   float randomFloat(float average, float standardDeviation) {
     // Set up random interval
@@ -116,7 +134,7 @@ private:
   float frameTime;
 
   // Amount of units the player has advanced
-  float playerProgress{ 0.0 };
+  int playerProgress{ 0 };
 
   // Amount of units the player is offset on the x axis
   int playerX{ 0 };
@@ -131,18 +149,24 @@ private:
   float speedZ{ advanceSpeed };
 
   // Time remaining until next stumble, in seconds
-  float stumbleTimer;
+  float stumbleTimer{ averageStumbleInterval };
 
   // Time remaining until next speed-up, in seconds
-  float speedUpTimer;
+  float speedUpTimer{ speedUpRate };
+
+  // When player reaches this Z position, it's time to generate a new obstacle
+  int nextObstacleZ{ ObstacleGenerator::averageObstacleSpacing };
 
   //////////////////////// CONSTANT STATE
+
+  // Random generator engine
+  std::default_random_engine randomGenerator{ (unsigned)time(NULL) };
 
   // SDL Wrapper instance
   SDLWrapper sdl;
 
-  // Random generator engine
-  std::default_random_engine randomGenerator{ (unsigned)time(NULL) };
+  // Obstacle generator instance
+  ObstacleGenerator obstacleGenerator;
 };
 
 #endif
