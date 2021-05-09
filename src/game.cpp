@@ -7,10 +7,6 @@
 // Clamp a given speed to boundaries set by moveSpeedCap
 #define CLAMP_SPEED(speed) std::clamp((float)(speed), -moveSpeedCap, moveSpeedCap)
 
-static int clampMirrored(int a, int b) {
-  return std::clamp(a, -b / 2, b / 2);
-}
-
 void eventHandlerWrapper(void* context, SDL_Event& event) {
   static_cast<Game*>(context)->eventHandler(event);
 }
@@ -88,6 +84,9 @@ void Game::collisionCheck() {
       collide();
     }
   }
+
+  // Also check to see if player tripped over the sidewalk boundaries
+  if (playerX < -(sideWalkWidth / 2) || playerX > sideWalkWidth / 2) collide();
 }
 
 void Game::applyMovement() {
@@ -115,12 +114,6 @@ void Game::applyMovement() {
 
   // Frontal movement
   playerProgress += (int)(speedZ * frameTime);
-}
-
-void Game::movePlayer(int offset) {
-  // Apply movement
-  // Restrict to sidewalk boundaries
-  playerX = clampMirrored(playerX + offset, sideWalkWidth);
 }
 
 // Sets time until next stumble

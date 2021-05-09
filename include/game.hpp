@@ -138,8 +138,8 @@ private:
   // Handles which frame to apply speed-up
   void speedUp();
 
-  // Move player to the side
-  void movePlayer(int offset);
+  // Move player to the side (may overstep sidewalk boundaries)
+  void movePlayer(int offset) { playerX += offset; }
 
   // Checks for collision with obstacles that were surpassed in the current frame
   void collisionCheck();
