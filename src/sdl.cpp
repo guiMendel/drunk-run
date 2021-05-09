@@ -66,7 +66,7 @@ void SDLWrapper::renderFrame(int score) {
   auto rendererPtr = renderer.get();
 
   // Clear screen
-  SDL_SetRenderDrawColor(rendererPtr, 12, 20, 69, 255);
+  SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0xFF, 0xFF, 0xFF);
   SDL_RenderClear(rendererPtr);
 
   if (collision) {
@@ -122,27 +122,32 @@ void SDLWrapper::collisionCheck() {
 }
 
 void SDLWrapper::gameOver() {
+  // Get renderer
   auto rendererPtr = renderer.get();
 
-  //Display the "Game Over" message
+  // Create "Game Over" message
   Text text1("Game Over", screenWidth / 2 - 250, screenHeight / 2 - 150, 200, 500);
-
+  // Color
   SDL_Color yellow = SDL_Color{ 247, 216, 39, 255 };
-
+  // Font
   Font font1("Fonts/game_over.ttf", 128, yellow);
+  // Display it
   font1.RenderText(rendererPtr, text1);
 
-  //Display the info to exit the game
-  Text text2("press q to exit", screenWidth / 2 - 150, screenHeight / 2 + 60, 80, 300);
-
-  SDL_Color white = SDL_Color{ 255, 255, 255, 255 };
-  Font font2("Fonts/Roboto-Bold.ttf", 128, white);
+  // Create message to exit the game
+  Text text2("Press 'q' to exit", screenWidth / 2 - 150, screenHeight / 2 + 60, 80, 300);
+  // Color
+  SDL_Color black = SDL_Color{ 0x00, 0x00, 0x00, 0xFF };
+  // Font
+  Font font2("Fonts/Roboto-Bold.ttf", 128, black);
+  // Display it
   font2.RenderText(rendererPtr, text2);
 
-  //Display the final score
-  Text score("score: " + std::to_string(m_score) + " m", screenWidth / 2 - 100, screenHeight / 40 + 40, 60, 200);
-
-  Font font3("Fonts/Roboto-Bold.ttf", 128, white);
+  // Create final score message
+  Text score("Final score: " + std::to_string(m_score) + " m", screenWidth / 2 - 100, screenHeight / 40 + 40, 60, 200);
+  // Font
+  Font font3("Fonts/Roboto-Bold.ttf", 128, black);
+  // Display it
   font2.RenderText(rendererPtr, score);
 }
 
