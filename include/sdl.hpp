@@ -87,18 +87,13 @@ public:
       throw std::runtime_error(errorMessage + "\n==> SDL error: " + SDL_GetError());
   }
 
-  /*Display the meter count
-  * meter is the current score
-  */
-  void meterCount(int meter);
+  // Display fiven parameter as current score on the screen
+  void displayMeterCount(int meter);
 
 private:
   //////////////////////// LOGIC
   // Verifies if camera is colliding in this frame with the front obstacle in the deque 
-  void collisionCheck(); // TODO
-
-  //Display a game over message
-  void gameOver();
+  void collisionCheck();
 
   //////////////////////// GEOMETRY
 
@@ -132,7 +127,11 @@ private:
   // Draw the borders of the ground
   void drawFloor();
 
-  void drawText(Text text, Font font);
+  //////////////////////// SCREEN
+  
+  // Display the game over screen
+  void gameOverScreen();
+
   //////////////////////// MUTABLE STATE
 
   // Deque of all active obstacles, ordered in Z position
@@ -141,7 +140,7 @@ private:
   // If turned on, draws only wireframes
   bool wireframesOnly{ false };
 
-  // true if collision
+  // True if collision
   bool collision{ false };
 
   // Keeps track of the time elapsed between frames
@@ -154,7 +153,7 @@ private:
   int cameraX{ 0 };
 
   // The final score
-  int m_score{0};
+  int finalScore{ 0 };
 
   //////////////////////// CONSTANT STATE
 

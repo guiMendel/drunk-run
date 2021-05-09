@@ -8,62 +8,67 @@
 class Text {
 public:
 
-    /* Default Constructor */
-    Text();
+  /* Default Constructor */
+  Text() = default;
 
-    /* Constructor
-    * text is the message to display
-    * position_x, position_y : the positions
-    * height, width: the size of the text
-    */
-    Text(std::string text, int position_x, int position_y, int height, int width);
+  /* Constructor
+  * text is the message to display
+  * position_x, position_y : the positions
+  * height, width: the size of the text
+  */
+  Text(std::string text, int position_x, int position_y, int height, int width) :
+    m_text(text), m_position_x(position_x), m_position_y(position_y), m_height(height), m_width(width) {
+  }
 
-    /* Getters */
+  /* Getters */
 
-    std::string getText();
-    int getX();
-    int getY();
-    int getHeight();
-    int getWidth();
+  std::string getText() { return m_text; }
+  int getX() { return m_position_x; }
+  int getY() { return m_position_y; }
+  int getHeight() { return m_height; }
+  int getWidth() { return m_width; }
 
 private:
 
-    std::string m_text;
-    int m_position_x;
-    int m_position_y;
-    int m_height;
-    int m_width;
+  std::string m_text;
+  int m_position_x;
+  int m_position_y;
+  int m_height;
+  int m_width;
 };
+
+#define DEFAULT_FONT_PATH "Fonts/Roboto-Bold.ttf"
+#define DEFAULT_FONT_SIZE 128
+#define DEFAULT_FONT_COLOR SDL_Color{ 255, 33, 52, 255 }
 
 class Font {
 public:
+  /* Constructor
+  * path is the path to the font
+  * fontSize, the size of the font
+  * color, the color of the font (r, g, b, alpha)
+  */
+  Font(std::string const& path, int fontSize, SDL_Color color) : fontColor(color) {
+    font = TTF_OpenFont(path.c_str(), fontSize);
+  }
 
-    static const std::string defaultFont;
-    static const int defaultFontSize = 128;
-    static const SDL_Color defaultFontColor;
+  /* Default Constructor */
+  Font() : Font(DEFAULT_FONT_PATH, DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR) {}
 
-    /* Default Constructor */
-    Font();
+  /* Destructor */
+  ~Font() {
+    TTF_CloseFont(font);
+  }
 
-    /* Constructor
-    * path is the path to the font
-    * fontSize, the size of the font
-    * color, the color of the font (r, g, b, alpha)
-    */
-    Font(std::string const& path, int fontSize, SDL_Color color);
-
-    /* Destructor */
-    ~Font() {
-        TTF_CloseFont(m_font);
-    }
-
-    /* Display the text */
-    void RenderText(SDL_Renderer* renderer, Text text);
+  /* Display the text */
+  void RenderText(SDL_Renderer* renderer, Text text);
 
 private:
 
-    TTF_Font* m_font;
-    SDL_Color m_fontColor;
+  // Font
+  TTF_Font* font;
+  // Font's color
+  SDL_Color fontColor{ DEFAULT_FONT_COLOR };
 };
 
 #endif // DRUNKRUN_TEXT_H

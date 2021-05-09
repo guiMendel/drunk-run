@@ -70,12 +70,12 @@ void SDLWrapper::renderFrame(int score) {
   SDL_RenderClear(rendererPtr);
 
   if (collision) {
-    gameOver();
+    gameOverScreen();
   }
   else {
     //Display the current score
-    meterCount(score);
-    m_score = score;
+    displayMeterCount(score);
+    finalScore = score;
 
     // Draw floor
     drawFloor();
@@ -93,7 +93,7 @@ void SDLWrapper::renderFrame(int score) {
   // std::cout << obstacles.size() << std::endl;
 }
 
-void SDLWrapper::meterCount(int meter) {
+void SDLWrapper::displayMeterCount(int meter) {
   auto rendererPtr = renderer.get();
 
   std::string s = std::to_string(meter) + " m";
@@ -121,7 +121,7 @@ void SDLWrapper::collisionCheck() {
   }
 }
 
-void SDLWrapper::gameOver() {
+void SDLWrapper::gameOverScreen() {
   // Get renderer
   auto rendererPtr = renderer.get();
 
@@ -144,7 +144,7 @@ void SDLWrapper::gameOver() {
   font2.RenderText(rendererPtr, text2);
 
   // Create final score message
-  Text score("Final score: " + std::to_string(m_score) + " m", screenWidth / 2 - 100, screenHeight / 40 + 40, 60, 200);
+  Text score("Final score: " + std::to_string(finalScore) + " m", screenWidth / 2 - 100, screenHeight / 40 + 40, 60, 200);
   // Font
   Font font3("Fonts/Roboto-Bold.ttf", 128, black);
   // Display it
