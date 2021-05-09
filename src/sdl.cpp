@@ -94,14 +94,14 @@ void SDLWrapper::renderFrame(int score) {
 }
 
 void SDLWrapper::displayMeterCount(int meter) {
-  auto rendererPtr = renderer.get();
+  // Get message
+  std::string scoreMessage = std::to_string(meter) + " m";
 
-  std::string s = std::to_string(meter) + " m";
-  char const* text = s.c_str();
-  Text score(text, screenWidth / 2 - 50, screenHeight / 40, 70, 100);
+  // Get text asset
+  Text score(scoreMessage.c_str(), screenWidth / 2 - 50, screenHeight / 40, 100, 70);
 
-  Font font;
-  font.RenderText(rendererPtr, score);
+  // Render on screen with default font
+  Font(renderer.get()).render(score);
 }
 
 /******************************************************************************
@@ -125,30 +125,27 @@ void SDLWrapper::gameOverScreen() {
   // Get renderer
   auto rendererPtr = renderer.get();
 
-  // Create "Game Over" message
-  Text text1("Game Over", screenWidth / 2 - 250, screenHeight / 2 - 150, 200, 500);
-  // Color
+  // Font color
   SDL_Color yellow = SDL_Color{ 247, 216, 39, 255 };
-  // Font
-  Font font1("Fonts/game_over.ttf", 128, yellow);
-  // Display it
-  font1.RenderText(rendererPtr, text1);
 
+  // Make fonts
+  Font gameOverFont("Fonts/game_over.ttf", 128, yellow, rendererPtr);
+  Font defaultFont(rendererPtr);
+
+  // Create "Game Over" message
+  Text gameOverText("Game Over", screenWidth / 2 - 250, screenHeight / 2 - 150, 500, 200);
+  
   // Create message to exit the game
-  Text text2("Press 'q' to exit", screenWidth / 2 - 150, screenHeight / 2 + 60, 80, 300);
-  // Color
-  SDL_Color black = SDL_Color{ 0x00, 0x00, 0x00, 0xFF };
-  // Font
-  Font font2("Fonts/Roboto-Bold.ttf", 128, black);
-  // Display it
-  font2.RenderText(rendererPtr, text2);
+  Text exitText("Press 'q' to exit", screenWidth / 2 - 150, screenHeight / 2 + 60, 300, 80);
 
   // Create final score message
-  Text score("Final score: " + std::to_string(finalScore) + " m", screenWidth / 2 - 100, screenHeight / 40 + 40, 60, 200);
-  // Font
-  Font font3("Fonts/Roboto-Bold.ttf", 128, black);
-  // Display it
-  font2.RenderText(rendererPtr, score);
+  std::string finalScoreMessage = "Final score: " + std::to_string(finalScore) + " m";
+  Text scoreText(finalScoreMessage, screenWidth / 2 - 100, screenHeight / 40 + 40, 200, 60);
+
+  // Display messages
+  gameOverFont.render(gameOverText);
+  defaultFont.render(exitText);
+  defaultFont.render(scoreText);
 }
 
 SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width,

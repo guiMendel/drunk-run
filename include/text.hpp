@@ -17,30 +17,33 @@ public:
   * position_x, position_y : the positions
   * height, width: the size of the text
   */
-  Text(std::string text, int position_x, int position_y, int height, int width) :
-    m_text(text), m_position_x(position_x), m_position_y(position_y), m_height(height), m_width(width) {
+  Text(std::string text, int position_x, int position_y, int width, int height) :
+    textMessage(text), positionX(position_x), positionY(position_y), width(width), height(height) {
   }
 
-  /* Getters */
-
-  std::string getText() { return m_text; }
-  int getX() { return m_position_x; }
-  int getY() { return m_position_y; }
-  int getHeight() { return m_height; }
-  int getWidth() { return m_width; }
-
 private:
+  // Font has access to this class
+  friend class Font;
 
-  std::string m_text;
-  int m_position_x;
-  int m_position_y;
-  int m_height;
-  int m_width;
+  // Message this object holds
+  std::string textMessage;
+
+  // X position of message on screen
+  int positionX;
+
+  // Y position of message on screen
+  int positionY;
+
+  // Width of message
+  int width;
+
+  // Height of message
+  int height;
 };
 
 #define DEFAULT_FONT_PATH "Fonts/Roboto-Bold.ttf"
 #define DEFAULT_FONT_SIZE 128
-#define DEFAULT_FONT_COLOR SDL_Color{ 255, 33, 52, 255 }
+#define DEFAULT_FONT_COLOR SDL_Color{ 0x00, 0x00, 0x00, 0xFF }
 
 class Font {
 public:
@@ -49,23 +52,26 @@ public:
   * fontSize, the size of the font
   * color, the color of the font (r, g, b, alpha)
   */
-  Font(std::string const& path, int fontSize, SDL_Color color) :
+  Font(std::string const& path, int fontSize, SDL_Color color, SDL_Renderer* renderer) :
     font(TTF_OpenFont(path.c_str(), fontSize), TTF_CloseFont),
-    fontColor(color) {
+    fontColor(color),
+    renderer(renderer) {
   }
 
-  /* Default Constructor */
-  Font() : Font(DEFAULT_FONT_PATH, DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR) {}
-
-  /* Display the text */
-  void RenderText(SDL_Renderer* renderer, Text text);
+  Font(SDL_Renderer* renderer) : Font(DEFAULT_FONT_PATH, DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR, renderer) {}
+    
+  /* Display some text */
+  void render(Text text);
 
 private:
-
   // Font
   std::unique_ptr<TTF_Font, void(*)(TTF_Font*)> font;
+
   // Font's color
   SDL_Color fontColor{ DEFAULT_FONT_COLOR };
+
+  // Pointer to renderer for this font
+  SDL_Renderer* renderer;
 };
 
 #endif // DRUNKRUN_TEXT_H
