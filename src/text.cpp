@@ -9,7 +9,7 @@
 
 void Font::RenderText(SDL_Renderer* renderer, Text text) {
   // Create text
-  SDL_Surface* textSurface = TTF_RenderText_Solid(font, text.getText().c_str(), fontColor);
+  SDL_Surface* textSurface = TTF_RenderText_Solid(font.get(), text.getText().c_str(), fontColor);
   SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
   
   // Free surface

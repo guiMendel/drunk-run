@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <string>
+#include <memory>
 
 class Text {
 public:
@@ -48,17 +49,13 @@ public:
   * fontSize, the size of the font
   * color, the color of the font (r, g, b, alpha)
   */
-  Font(std::string const& path, int fontSize, SDL_Color color) : fontColor(color) {
-    font = TTF_OpenFont(path.c_str(), fontSize);
+  Font(std::string const& path, int fontSize, SDL_Color color) :
+    font(TTF_OpenFont(path.c_str(), fontSize), TTF_CloseFont),
+    fontColor(color) {
   }
 
   /* Default Constructor */
   Font() : Font(DEFAULT_FONT_PATH, DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR) {}
-
-  /* Destructor */
-  ~Font() {
-    TTF_CloseFont(font);
-  }
 
   /* Display the text */
   void RenderText(SDL_Renderer* renderer, Text text);
@@ -66,7 +63,7 @@ public:
 private:
 
   // Font
-  TTF_Font* font;
+  std::unique_ptr<TTF_Font, void(*)(TTF_Font*)> font;
   // Font's color
   SDL_Color fontColor{ DEFAULT_FONT_COLOR };
 };
