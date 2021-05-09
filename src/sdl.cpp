@@ -47,7 +47,7 @@ void SDLWrapper::resolveEvents(void(*eventHandler)(void*, SDL_Event&), void* con
   }
 }
 
-void SDLWrapper::setCamera(int x, float z) {
+void SDLWrapper::setCamera(int x, int z) {
   cameraX = x;
   cameraZ = z;
 
@@ -71,7 +71,8 @@ void SDLWrapper::renderFrame(int score) {
 
   if (collision) {
     gameOver();
-  }else {
+  }
+  else {
     //Display the current score
     meterCount(score);
     m_score = score;
@@ -81,7 +82,7 @@ void SDLWrapper::renderFrame(int score) {
 
     // Draw each one of the obstacles
     for (auto obstacle = obstacles.rbegin();
-              obstacle != obstacles.rend(); obstacle++) {
+      obstacle != obstacles.rend(); obstacle++) {
       // Dereferentiate iterator and unique_ptr
       drawObstacle(**obstacle);
     }
@@ -96,8 +97,8 @@ void SDLWrapper::meterCount(int meter) {
   auto rendererPtr = renderer.get();
 
   std::string s = std::to_string(meter) + " m";
-  char const *text = s.c_str();
-  Text score(text, screenWidth/2 - 50, screenHeight/40, 70, 100);
+  char const* text = s.c_str();
+  Text score(text, screenWidth / 2 - 50, screenHeight / 40, 70, 100);
 
   Font font;
   font.RenderText(rendererPtr, score);
@@ -112,8 +113,8 @@ void SDLWrapper::collisionCheck() {
   int x2 = x1 + obstacles.front().get()->width;
 
   //The width of the player is screenWidth/2
-  int playerX1 = cameraX - screenWidth/4;
-  int playerX2 = cameraX + screenWidth/4;
+  int playerX1 = cameraX - screenWidth / 4;
+  int playerX2 = cameraX + screenWidth / 4;
 
   if (!(x2 < playerX1) && !(x1 > playerX2)) {
     collision = true;
@@ -124,29 +125,29 @@ void SDLWrapper::gameOver() {
   auto rendererPtr = renderer.get();
 
   //Display the "Game Over" message
-  Text text1("Game Over", screenWidth/2 - 250, screenHeight/2 - 150, 200, 500);
+  Text text1("Game Over", screenWidth / 2 - 250, screenHeight / 2 - 150, 200, 500);
 
-  SDL_Color yellow = SDL_Color{247, 216, 39, 255};
+  SDL_Color yellow = SDL_Color{ 247, 216, 39, 255 };
 
   Font font1("Fonts/game_over.ttf", 128, yellow);
   font1.RenderText(rendererPtr, text1);
 
   //Display the info to exit the game
-  Text text2("press q to exit", screenWidth/2 - 150, screenHeight/2 + 60, 80, 300);
+  Text text2("press q to exit", screenWidth / 2 - 150, screenHeight / 2 + 60, 80, 300);
 
-  SDL_Color white = SDL_Color{255, 255, 255, 255};
+  SDL_Color white = SDL_Color{ 255, 255, 255, 255 };
   Font font2("Fonts/Roboto-Bold.ttf", 128, white);
   font2.RenderText(rendererPtr, text2);
 
   //Display the final score
-  Text score("score: " + std::to_string(m_score) + " m", screenWidth/2 - 100, screenHeight/40 + 40, 60, 200);
+  Text score("score: " + std::to_string(m_score) + " m", screenWidth / 2 - 100, screenHeight / 40 + 40, 60, 200);
 
   Font font3("Fonts/Roboto-Bold.ttf", 128, white);
   font2.RenderText(rendererPtr, score);
 }
 
-SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width, 
-                                int height, int distance) {
+SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width,
+  int height, int distance) {
   return SDL_Rect({
     x(perspective(bottomLeft, distance, AXIS_X)),
     y(perspective(GROUND_Y, distance, AXIS_Y)),
@@ -166,14 +167,13 @@ void SDLWrapper::drawObstacle(Obstacle& obstacle) {
   auto rendererPtr = renderer.get();
 
   // Draw sides
-  drawSides(obstacle.bottomLeft, obstacle.width, obstacle.height, distance);
+  drawSides(obstacle.bottomLeft, obstacle.width, obstacle.height, obstacle.depth, distance);
 
   // Paint color
   SDL_SetRenderDrawColor(rendererPtr, OBSTACLE_COLOR);
 
   // Draw front face
-  SDL_Rect outlineRect = makeRect(obstacle.bottomLeft, obstacle.width,
-                                   obstacle.height, distance);
+  SDL_Rect outlineRect = makeRect(obstacle.bottomLeft, obstacle.width, obstacle.height, distance);
 
   // Filled
   if (!wireframesOnly) SDL_RenderFillRect(rendererPtr, &outlineRect);
@@ -182,8 +182,7 @@ void SDLWrapper::drawObstacle(Obstacle& obstacle) {
     SDL_RenderDrawRect(rendererPtr, &outlineRect);
 
     // Draw back face
-    outlineRect = makeRect(obstacle.bottomLeft, obstacle.width, obstacle.height,
-                                   distance + OBSTACLE_DEPTH);
+    outlineRect = makeRect(obstacle.bottomLeft, obstacle.width, obstacle.height, distance + obstacle.depth);
     SDL_RenderDrawRect(rendererPtr, &outlineRect);
   }
 }
