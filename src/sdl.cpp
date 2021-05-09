@@ -111,12 +111,13 @@ void SDLWrapper::meterCount(int meter) {
 void SDLWrapper::collisionCheck() {
   int x1 = obstacles.front().get()->bottomLeft;
   int x2 = x1 + obstacles.front().get()->width;
+  int h = obstacles.front().get()->height;
 
   //The width of the player is screenWidth/2
   int playerX1 = cameraX - screenWidth / 4;
   int playerX2 = cameraX + screenWidth / 4;
 
-  if (!(x2 < playerX1) && !(x1 > playerX2)) {
+  if ((h > 70) && !(x2 < playerX1) && !(x1 > playerX2)) {
     collision = true;
   }
 }
