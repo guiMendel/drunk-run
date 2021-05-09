@@ -1,4 +1,4 @@
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -27,13 +27,13 @@ void Game::eventHandler(SDL_Event& event) {
     // std::cout << "Hit" << std::endl;
     switch (event.key.keysym.sym) {
       // Move left
-    case SDLK_a:
+    case SDLK_l:
     case SDLK_LEFT:
       startMoving(-moveAcceleration);
       break;
 
       // Move right
-    case SDLK_d:
+    case SDLK_m:
     case SDLK_RIGHT:
       startMoving(moveAcceleration);
       break;
@@ -211,6 +211,6 @@ void Game::startGame() {
     handleObstacles();
 
     // Render the game screen frame
-    sdl.renderFrame();
+    sdl.renderFrame(playerProgress/speedZ);
   }
 }

@@ -5,7 +5,7 @@ CC = g++
 INCLUDE_PATHS = $(shell sdl2-config --cflags)
 
 #LIBRARY_PATHS specifies the additional library paths we'll need
-LIBRARY_PATHS = $(shell sdl2-config --libs) 
+LIBRARY_PATHS = $(shell sdl2-config --libs) -lSDL2_ttf
 
 # points to local include folder
 LOCAL_INCLUDE_PATH = include
@@ -25,11 +25,11 @@ COMPILATION_ARGS = $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS)
 ##################################################################################
 
 #DEPS header files
-_DEPS = sdl.hpp game.hpp obstacleGenerator.hpp obstacle.hpp
+_DEPS = sdl.hpp game.hpp obstacleGenerator.hpp text.hpp obstacle.hpp
 DEPS = $(patsubst %,$(LOCAL_INCLUDE_PATH)/%,$(_DEPS))
 
 #OBJS specifies which files to compile as part of the project
-_OBJS = main.o sdl.o game.o obstacleGenerator.o
+_OBJS = main.o sdl.o game.o obstacleGenerator.o text.o
 OBJS = $(patsubst %,$(OBJ_PATH)/%,$(_OBJS))
 
 ##################################################################################

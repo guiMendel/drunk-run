@@ -1,7 +1,8 @@
 #ifndef __SDLWRAPPER__
 #define __SDLWRAPPER__
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <memory>
 #include <string>
 #include <stdexcept>
@@ -10,6 +11,7 @@
 #include <deque>
 #include <utility>
 #include "obstacle.hpp"
+#include "text.hpp"
 
 // Config params
 
@@ -36,6 +38,7 @@ public:
     renderer(nullptr, SDL_DestroyRenderer) {
     // Initialize SDL
     ensure(SDL_Init(SDL_INIT_VIDEO) >= 0, "Failed to initialize SDL");
+    ensure(TTF_Init() == 0, "Failed to initialize TTF");
     // Calculate eye distance using tan(30) & screen width
     eyeDistance = (screenWidth / 2.0) / 0.57735026919;
   }
@@ -57,7 +60,7 @@ public:
   void setCamera(int x, int z);
 
   // Renders a new frame
-  void renderFrame();
+  void renderFrame(int score);
 
   //////////////////////// OBSTACLE INTERFACE
 
@@ -84,12 +87,19 @@ public:
       throw std::runtime_error(errorMessage + "\n==> SDL error: " + SDL_GetError());
   }
 
+  /*Display the meter count
+  * meter is the current score
+  */
+  void meterCount(int meter);
+
 private:
   //////////////////////// LOGIC
-
   // Verifies if camera is colliding in this frame with the front obstacle in the deque 
   void collisionCheck(); // TODO
-  
+
+  //Display a game over message
+  void gameOver();
+
   //////////////////////// GEOMETRY
 
   // Applies perspective to a point
@@ -122,6 +132,7 @@ private:
   // Draw the borders of the ground
   void drawFloor();
 
+  void drawText(Text text, Font font);
   //////////////////////// MUTABLE STATE
 
   // Deque of all active obstacles, ordered in Z position
@@ -129,6 +140,9 @@ private:
 
   // If turned on, draws only wireframes
   bool wireframesOnly{ false };
+
+  // true if collision
+  bool collision{ false };
 
   // Keeps track of the time elapsed between frames
   Uint32 timeStick{ 0 };
@@ -138,6 +152,9 @@ private:
 
   // Camera x position
   int cameraX{ 0 };
+
+  // The final score
+  int m_score{0};
 
   //////////////////////// CONSTANT STATE
 

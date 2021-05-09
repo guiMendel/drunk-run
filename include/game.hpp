@@ -1,7 +1,7 @@
 #ifndef __GAME__
 #define __GAME__
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <random>
 #include <ctime>
 #include "sdl.hpp"
