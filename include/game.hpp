@@ -19,11 +19,16 @@ public:
 
   //////////////////////// CONFIG CONSTANTS
 
+  //////// General
+
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
 
   // Distance in which new obstacles are generated
   static const int depthOfView = 50000;
+
+  // Number of units correspondent to 1 meter
+  static const int unitsPerScore = 2000;
 
   //////// Forward Movement
 
@@ -57,6 +62,11 @@ public:
   // Standard deviation for stumble intensity
   static constexpr float stumbleIntensityStandardDeviation = 500.0;
 
+  //////// Collision
+
+  // Player width, impacts his area of collision hurtbox
+  static const int playerWidth = SCREEN_WIDTH / 2;
+
   //////////////////////// GAME
 
   Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth), obstacleGenerator(randomGenerator, sdl) {}
@@ -85,6 +95,9 @@ private:
 
   // Return DoV relative to player's position
   int currentDepthOfView() { return depthOfView + playerProgress; }
+
+  // Calculate scorerelative to player progress
+  int playerScore() { return playerProgress / unitsPerScore; }
 
   float randomFloat(float average, float standardDeviation) {
     // Set up random interval
@@ -125,10 +138,25 @@ private:
   // Move player to the side
   void movePlayer(int offset);
 
+  // Checks for collision with obstacles that were surpassed in the current frame
+  void collisionCheck();
+
+  // Handles logic for when a collision happens
+  void collide() {
+    // Registers collision
+    playerCollided = true;
+
+    // Show game over screen
+    sdl.gameOverScreen(playerScore());
+  }
+
   //////////////////////// MUTABLE STATE
 
   // Defines if the main game loop is ongoing
   bool gameActive{ false };
+
+  // Turns to true after collision, to indicate the running cycle is over
+  bool playerCollided{ false };
 
   // Indicates the amount of time elapsed from last frame to this frame, in seconds
   float frameTime;

@@ -63,6 +63,9 @@ public:
   // Renders a new frame
   void renderFrame(int score);
 
+  // Display the game over screen
+  void gameOverScreen(int finalScore);
+
   //////////////////////// OBSTACLE INTERFACE
 
   // Create a new obstacle and add it to the queue
@@ -72,11 +75,11 @@ public:
     obstacles.push_back(std::make_unique<Obstacle>(std::forward<Args>(args)...));
   }
 
-  // Registers a new observer for the collision event
-  void subscribeToCollision(void(*observer)()) { collisionObservers.push_back(observer); }
-
   // Toggles between drawing wireframes or filled cubes
   void toggleWireframe() { wireframesOnly = !wireframesOnly; }
+
+  // Get list of all obstacles that were surpassed in the current frame
+  std::list<Obstacle>& getSurpassedObstacles() { return surpassedObstacles; }
 
   //////////////////////// HELPERS
 
@@ -94,16 +97,6 @@ public:
   }
 
 private:
-  //////////////////////// LOGIC
-
-  // Verifies if camera is colliding in this frame with the front obstacle in the deque 
-  void collisionCheck();
-
-  // Raises the collision event to any observers
-  void raiseCollisionEvent() {
-    for (auto& observer : collisionObservers) observer();
-  }
-
   //////////////////////// GEOMETRY
 
   // Applies perspective to a point
@@ -138,9 +131,6 @@ private:
 
   //////////////////////// SCREEN
 
-  // Display the game over screen
-  void gameOverScreen();
-
   // Display score
   // meter is how many meters the player has advanced so far
   void displayScore(int meter);
@@ -162,8 +152,8 @@ private:
   // Camera x position
   int cameraX{ 0 };
 
-  // Observers for collision event (observers are functions)
-  std::list<void(*)()> collisionObservers;
+  // List of copies of all obstacles that were surpassed in this frame
+  std::list<Obstacle> surpassedObstacles;
 
   //////////////////////// CONSTANT STATE
 

@@ -51,11 +51,14 @@ void SDLWrapper::setCamera(int x, int z) {
   cameraX = x;
   cameraZ = z;
 
+  // Empties surpassedObstacles list from last frame
+  surpassedObstacles.clear();
+
   // Destroy all objects that were left behind
   while (obstacles.size() > 0 && obstacles.front()->z < cameraZ) {
-    // Checks for collision, TODO if collision : need to stop the game
-    collisionCheck();
-
+    // Adds copy of this obstacle to surpassed obtacles list
+    surpassedObstacles.push_back(*(obstacles.front()));
+    
     // Destroys this obstacle
     obstacles.pop_front();
   }
@@ -106,26 +109,13 @@ void SDLWrapper::displayScore(int meter) {
  * Private methods
 ******************************************************************************/
 
-void SDLWrapper::collisionCheck() {
-  // Get obstacle boundaries
-  int obstacleLeft = obstacles.front()->bottomLeft;
-  int obstacleRight = obstacleLeft + obstacles.front()->width;
-
-  // The width of the player is screenWidth/2
-  // Get player boundaries
-  int playerLeft = cameraX - screenWidth / 4;
-  int playerRight = cameraX + screenWidth / 4;
-
-  // If the boundaries overlap
-  if ((obstacleRight > playerLeft) && (obstacleLeft < playerRight)) {
-    // Raise a collision event
-    raiseCollisionEvent();
-  }
-}
-
-void SDLWrapper::gameOverScreen() {
+void SDLWrapper::gameOverScreen(int finalScore) {
   // Get renderer
   auto rendererPtr = renderer.get();
+
+  // Clear screen
+  SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0xFF, 0xFF, 0xFF);
+  SDL_RenderClear(rendererPtr);
 
   // Font color
   SDL_Color yellow = SDL_Color{ 247, 216, 39, 255 };
@@ -138,16 +128,19 @@ void SDLWrapper::gameOverScreen() {
   Text gameOverText("Game Over", screenWidth / 2 - 250, screenHeight / 2 - 150, 500, 200);
 
   // Create message to exit the game
-  Text exitText("Press 'q' to exit", screenWidth / 2 - 150, screenHeight / 2 + 60, 300, 80);
+  Text exitText("Press 'q' to exit", screenWidth / 2 - 175, screenHeight / 2 + 60, 350, 80);
 
   // Create final score message
-  std::string finalScoreMessage = "Final score:  m";
-  Text scoreText(finalScoreMessage, screenWidth / 2 - 100, screenHeight / 40 + 40, 200, 60);
+  std::string finalScoreMessage = (std::string)"Final score: " + std::to_string(finalScore) + "m";
+  Text scoreText(finalScoreMessage, screenWidth / 2 - 150, screenHeight / 40 + 40, 300, 60);
 
   // Display messages
   gameOverFont.render(gameOverText);
   defaultFont.render(exitText);
   defaultFont.render(scoreText);
+
+  // Update screen
+  SDL_RenderPresent(rendererPtr);
 }
 
 SDL_Rect SDLWrapper::makeRect(int bottomLeft, int width,

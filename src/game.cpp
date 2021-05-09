@@ -66,6 +66,27 @@ void Game::eventHandler(SDL_Event& event) {
   }
 }
 
+void Game::collisionCheck() {
+  auto surpassedObstacles = sdl.getSurpassedObstacles();
+
+  // Check collision for each surpassed obstacle
+  for (auto obstacle : surpassedObstacles) {
+    // Get obstacle boundaries
+    int obstacleLeft = obstacle.bottomLeft;
+    int obstacleRight = obstacleLeft + obstacle.width;
+
+    // Get player boundaries
+    int playerLeft = playerX - playerWidth / 2;
+    int playerRight = playerX + playerWidth / 2;
+
+    // If the boundaries overlap
+    if ((obstacleRight > playerLeft) && (obstacleLeft < playerRight)) {
+      // Collision is detected
+      collide();
+    }
+  }
+}
+
 void Game::applyMovement() {
   // Lateral acceleration
   if (accelerationX) {
@@ -190,12 +211,15 @@ void Game::startGame() {
 
   // Initialize game loop
   while (gameActive) {
+    // Handle input
+    handleUserInput();
+
+    // When player has collided, the running cycle stops
+    if (playerCollided) continue;
+
     // Get elapsed frame time
     frameTime = sdl.elapsedTime() / 1000.0;
     // std::cout << frameTime << std::endl;
-
-    // Handle input
-    handleUserInput();
 
     // Update player movement
     applyMovement();
@@ -209,10 +233,16 @@ void Game::startGame() {
     // Update camera to player position
     sdl.setCamera(playerX, playerProgress);
 
+    // Check for collision
+    collisionCheck();
+
+    // If there was collision, skip this cycle
+    if (playerCollided) continue;
+
     // Procedural obstacle generation
     handleObstacles();
 
     // Render the game screen frame
-    sdl.renderFrame(playerProgress/speedZ);
+    sdl.renderFrame(playerScore());
   }
 }
