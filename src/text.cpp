@@ -3,10 +3,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-/******************************************************************************
- * Public methods Font
-******************************************************************************/
-
 void Font::render(Text text) {
   // Create text
   SDL_Surface* textSurface = TTF_RenderText_Solid(font.get(), text.textMessage.c_str(), fontColor);

@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <iostream>
 #include <deque>
+#include <list>
 #include <utility>
 #include "obstacle.hpp"
 #include "text.hpp"
@@ -67,7 +68,12 @@ public:
   // Create a new obstacle and add it to the queue
   // Passes all arguments directly to obstacle's constructor
   template <typename... Args>
-  void newObstacle(Args&&... args) { obstacles.push_back(std::make_unique<Obstacle>(std::forward<Args>(args)...)); }
+  void newObstacle(Args&&... args) {
+    obstacles.push_back(std::make_unique<Obstacle>(std::forward<Args>(args)...));
+  }
+
+  // Registers a new observer for the collision event
+  void subscribeToCollision(void(*observer)()) { collisionObservers.push_back(observer); }
 
   // Toggles between drawing wireframes or filled cubes
   void toggleWireframe() { wireframesOnly = !wireframesOnly; }
@@ -87,13 +93,16 @@ public:
       throw std::runtime_error(errorMessage + "\n==> SDL error: " + SDL_GetError());
   }
 
-  // Display fiven parameter as current score on the screen
-  void displayMeterCount(int meter);
-
 private:
   //////////////////////// LOGIC
+
   // Verifies if camera is colliding in this frame with the front obstacle in the deque 
   void collisionCheck();
+
+  // Raises the collision event to any observers
+  void raiseCollisionEvent() {
+    for (auto& observer : collisionObservers) observer();
+  }
 
   //////////////////////// GEOMETRY
 
@@ -128,9 +137,13 @@ private:
   void drawFloor();
 
   //////////////////////// SCREEN
-  
+
   // Display the game over screen
   void gameOverScreen();
+
+  // Display score
+  // meter is how many meters the player has advanced so far
+  void displayScore(int meter);
 
   //////////////////////// MUTABLE STATE
 
@@ -139,9 +152,6 @@ private:
 
   // If turned on, draws only wireframes
   bool wireframesOnly{ false };
-
-  // True if collision
-  bool collision{ false };
 
   // Keeps track of the time elapsed between frames
   Uint32 timeStick{ 0 };
@@ -152,8 +162,8 @@ private:
   // Camera x position
   int cameraX{ 0 };
 
-  // The final score
-  int finalScore{ 0 };
+  // Observers for collision event (observers are functions)
+  std::list<void(*)()> collisionObservers;
 
   //////////////////////// CONSTANT STATE
 

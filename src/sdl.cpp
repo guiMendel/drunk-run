@@ -69,32 +69,27 @@ void SDLWrapper::renderFrame(int score) {
   SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0xFF, 0xFF, 0xFF);
   SDL_RenderClear(rendererPtr);
 
-  if (collision) {
-    gameOverScreen();
-  }
-  else {
-    //Display the current score
-    displayMeterCount(score);
-    finalScore = score;
+  // Draw floor
+  drawFloor();
 
-    // Draw floor
-    drawFloor();
-
-    // Draw each one of the obstacles
-    for (auto obstacle = obstacles.rbegin();
-      obstacle != obstacles.rend(); obstacle++) {
-      // Dereferentiate iterator and unique_ptr
-      drawObstacle(**obstacle);
-    }
+  // Draw each one of the obstacles
+  for (auto obstacle = obstacles.rbegin();
+    obstacle != obstacles.rend(); obstacle++) {
+    // Dereferentiate iterator and unique_ptr
+    drawObstacle(**obstacle);
   }
+
+  // Render score
+  displayScore(score);
+
   // Update screen
   SDL_RenderPresent(rendererPtr);
 
   // std::cout << obstacles.size() << std::endl;
 }
 
-void SDLWrapper::displayMeterCount(int meter) {
-  // Get message
+void SDLWrapper::displayScore(int meter) {
+  // Get score
   std::string scoreMessage = std::to_string(meter) + " m";
 
   // Get text asset
@@ -102,6 +97,9 @@ void SDLWrapper::displayMeterCount(int meter) {
 
   // Render on screen with default font
   Font(renderer.get()).render(score);
+
+  // Update screen
+  SDL_RenderPresent(renderer.get());
 }
 
 /******************************************************************************
@@ -109,15 +107,19 @@ void SDLWrapper::displayMeterCount(int meter) {
 ******************************************************************************/
 
 void SDLWrapper::collisionCheck() {
-  int x1 = obstacles.front().get()->bottomLeft;
-  int x2 = x1 + obstacles.front().get()->width;
+  // Get obstacle boundaries
+  int obstacleLeft = obstacles.front()->bottomLeft;
+  int obstacleRight = obstacleLeft + obstacles.front()->width;
 
-  //The width of the player is screenWidth/2
-  int playerX1 = cameraX - screenWidth / 4;
-  int playerX2 = cameraX + screenWidth / 4;
+  // The width of the player is screenWidth/2
+  // Get player boundaries
+  int playerLeft = cameraX - screenWidth / 4;
+  int playerRight = cameraX + screenWidth / 4;
 
-  if (!(x2 < playerX1) && !(x1 > playerX2)) {
-    collision = true;
+  // If the boundaries overlap
+  if ((obstacleRight > playerLeft) && (obstacleLeft < playerRight)) {
+    // Raise a collision event
+    raiseCollisionEvent();
   }
 }
 
@@ -134,12 +136,12 @@ void SDLWrapper::gameOverScreen() {
 
   // Create "Game Over" message
   Text gameOverText("Game Over", screenWidth / 2 - 250, screenHeight / 2 - 150, 500, 200);
-  
+
   // Create message to exit the game
   Text exitText("Press 'q' to exit", screenWidth / 2 - 150, screenHeight / 2 + 60, 300, 80);
 
   // Create final score message
-  std::string finalScoreMessage = "Final score: " + std::to_string(finalScore) + " m";
+  std::string finalScoreMessage = "Final score:  m";
   Text scoreText(finalScoreMessage, screenWidth / 2 - 100, screenHeight / 40 + 40, 200, 60);
 
   // Display messages
