@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <iostream>
 #include <deque>
+#include <list>
 #include <utility>
 #include "obstacle.hpp"
 #include "text.hpp"
@@ -62,15 +63,23 @@ public:
   // Renders a new frame
   void renderFrame(int score);
 
+  // Display the game over screen
+  void gameOverScreen(int finalScore);
+
   //////////////////////// OBSTACLE INTERFACE
 
   // Create a new obstacle and add it to the queue
   // Passes all arguments directly to obstacle's constructor
   template <typename... Args>
-  void newObstacle(Args&&... args) { obstacles.push_back(std::make_unique<Obstacle>(std::forward<Args>(args)...)); }
+  void newObstacle(Args&&... args) {
+    obstacles.push_back(std::make_unique<Obstacle>(std::forward<Args>(args)...));
+  }
 
   // Toggles between drawing wireframes or filled cubes
   void toggleWireframe() { wireframesOnly = !wireframesOnly; }
+
+  // Get list of all obstacles that were surpassed in the current frame
+  std::list<Obstacle>& getSurpassedObstacles() { return surpassedObstacles; }
 
   //////////////////////// HELPERS
 
@@ -87,19 +96,7 @@ public:
       throw std::runtime_error(errorMessage + "\n==> SDL error: " + SDL_GetError());
   }
 
-  /*Display the meter count
-  * meter is the current score
-  */
-  void meterCount(int meter);
-
 private:
-  //////////////////////// LOGIC
-  // Verifies if camera is colliding in this frame with the front obstacle in the deque 
-  void collisionCheck(); // TODO
-
-  //Display a game over message
-  void gameOver();
-
   //////////////////////// GEOMETRY
 
   // Applies perspective to a point
@@ -132,7 +129,12 @@ private:
   // Draw the borders of the ground
   void drawFloor();
 
-  void drawText(Text text, Font font);
+  //////////////////////// SCREEN
+
+  // Display score
+  // meter is how many meters the player has advanced so far
+  void displayScore(int meter);
+
   //////////////////////// MUTABLE STATE
 
   // Deque of all active obstacles, ordered in Z position
@@ -140,9 +142,6 @@ private:
 
   // If turned on, draws only wireframes
   bool wireframesOnly{ false };
-
-  // true if collision
-  bool collision{ false };
 
   // Keeps track of the time elapsed between frames
   Uint32 timeStick{ 0 };
@@ -153,8 +152,8 @@ private:
   // Camera x position
   int cameraX{ 0 };
 
-  // The final score
-  int m_score{0};
+  // List of copies of all obstacles that were surpassed in this frame
+  std::list<Obstacle> surpassedObstacles;
 
   //////////////////////// CONSTANT STATE
 

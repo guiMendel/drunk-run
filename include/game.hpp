@@ -19,11 +19,22 @@ public:
 
   //////////////////////// CONFIG CONSTANTS
 
+  //////// General
+
+  // Defines the maximum frames per second
+  static const int frameRate = 30;
+
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
 
   // Distance in which new obstacles are generated
   static const int depthOfView = 50000;
+
+  // Number of units correspondent to 1 meter
+  static const int unitsPerScore = 3000;
+
+  // Units between starting position and the first obstacle
+  static const int startingSlack = 10000;
 
   //////// Forward Movement
 
@@ -57,6 +68,14 @@ public:
   // Standard deviation for stumble intensity
   static constexpr float stumbleIntensityStandardDeviation = 500.0;
 
+  //////// Collision
+
+  // Player width, impacts his area of collision hurtbox
+  static const int playerWidth = SCREEN_WIDTH / 2;
+
+  // Minimum height for an obstacle to be dangerous
+  static const int dangerousObstacleHeight = 200;
+
   //////////////////////// GAME
 
   Game() : sdl(SCREEN_WIDTH, SCREEN_HEIGHT, sideWalkWidth), obstacleGenerator(randomGenerator, sdl) {}
@@ -81,10 +100,16 @@ private:
   // Generates obstacles from player's position until his relative DoV
   void generateInitialObstacles();
 
+  // Caps frame time to maintain the frame rate cap
+  void capFrameRate();
+
   //////////////////////// HELPERS
 
   // Return DoV relative to player's position
   int currentDepthOfView() { return depthOfView + playerProgress; }
+
+  // Calculate scorerelative to player progress
+  int playerScore() { return playerProgress / unitsPerScore; }
 
   float randomFloat(float average, float standardDeviation) {
     // Set up random interval
@@ -122,13 +147,28 @@ private:
   // Handles which frame to apply speed-up
   void speedUp();
 
-  // Move player to the side
-  void movePlayer(int offset);
+  // Move player to the side (may overstep sidewalk boundaries)
+  void movePlayer(int offset) { playerX += offset; }
+
+  // Checks for collision with obstacles that were surpassed in the current frame
+  void collisionCheck();
+
+  // Handles logic for when a collision happens
+  void collide() {
+    // Registers collision
+    playerCollided = true;
+
+    // Show game over screen
+    sdl.gameOverScreen(playerScore());
+  }
 
   //////////////////////// MUTABLE STATE
 
   // Defines if the main game loop is ongoing
   bool gameActive{ false };
+
+  // Turns to true after collision, to indicate the running cycle is over
+  bool playerCollided{ false };
 
   // Indicates the amount of time elapsed from last frame to this frame, in seconds
   float frameTime;
@@ -155,7 +195,7 @@ private:
   float speedUpTimer{ speedUpRate };
 
   // When player reaches this Z position, it's time to generate a new obstacle
-  int nextObstacleZ{ ObstacleGenerator::averageObstacleSpacing };
+  int nextObstacleZ{ startingSlack };
 
   //////////////////////// CONSTANT STATE
 

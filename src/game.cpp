@@ -7,10 +7,6 @@
 // Clamp a given speed to boundaries set by moveSpeedCap
 #define CLAMP_SPEED(speed) std::clamp((float)(speed), -moveSpeedCap, moveSpeedCap)
 
-static int clampMirrored(int a, int b) {
-  return std::clamp(a, -b / 2, b / 2);
-}
-
 void eventHandlerWrapper(void* context, SDL_Event& event) {
   static_cast<Game*>(context)->eventHandler(event);
 }
@@ -66,6 +62,33 @@ void Game::eventHandler(SDL_Event& event) {
   }
 }
 
+void Game::collisionCheck() {
+  auto surpassedObstacles = sdl.getSurpassedObstacles();
+
+  // Check collision for each surpassed obstacle
+  for (auto obstacle : surpassedObstacles) {
+    // Get obstacle boundaries
+    int obstacleLeft = obstacle.bottomLeft;
+    int obstacleRight = obstacleLeft + obstacle.width;
+
+    // Get player boundaries
+    int playerLeft = playerX - playerWidth / 2;
+    int playerRight = playerX + playerWidth / 2;
+
+    // If the obstacle has a dangerous height & boundaries overlap
+    if (
+      obstacle.height >= dangerousObstacleHeight &&
+      (obstacleRight > playerLeft) && (obstacleLeft < playerRight)
+      ) {
+      // Collision is detected
+      collide();
+    }
+  }
+
+  // Also check to see if player tripped over the sidewalk boundaries
+  if (playerX < -(sideWalkWidth / 2) || playerX > sideWalkWidth / 2) collide();
+}
+
 void Game::applyMovement() {
   // Lateral acceleration
   if (accelerationX) {
@@ -91,12 +114,6 @@ void Game::applyMovement() {
 
   // Frontal movement
   playerProgress += (int)(speedZ * frameTime);
-}
-
-void Game::movePlayer(int offset) {
-  // Apply movement
-  // Restrict to sidewalk boundaries
-  playerX = clampMirrored(playerX + offset, sideWalkWidth);
 }
 
 // Sets time until next stumble
@@ -150,6 +167,18 @@ void Game::speedUp() {
   }
 }
 
+// Caps frame times to maintain the frame rate cap
+void Game::capFrameRate() {
+  // Minimum time the frame should take
+  float minimumTime = 1.0 / frameRate;
+
+  // How ahead this frame is of the minimum, in miliseconds
+  Uint32 msAhead = std::max(minimumTime - frameTime, (float)0.0) * 1000.0;
+
+  // If necessary, wait until the minimum time has elapsed
+  if (msAhead > 0) SDL_Delay(msAhead);
+}
+
 void Game::handleObstacles() {
   // Verify if player has advanced enough for game to generate more obstacles
   while (nextObstacleZ <= playerProgress) {
@@ -190,12 +219,15 @@ void Game::startGame() {
 
   // Initialize game loop
   while (gameActive) {
+    // Handle input
+    handleUserInput();
+
+    // When player has collided, the running cycle stops
+    if (playerCollided) continue;
+
     // Get elapsed frame time
     frameTime = sdl.elapsedTime() / 1000.0;
     // std::cout << frameTime << std::endl;
-
-    // Handle input
-    handleUserInput();
 
     // Update player movement
     applyMovement();
@@ -209,10 +241,19 @@ void Game::startGame() {
     // Update camera to player position
     sdl.setCamera(playerX, playerProgress);
 
+    // Check for collision
+    collisionCheck();
+
+    // If there was collision, skip this cycle
+    if (playerCollided) continue;
+
     // Procedural obstacle generation
     handleObstacles();
 
     // Render the game screen frame
-    sdl.renderFrame(playerProgress/speedZ);
+    sdl.renderFrame(playerScore());
+
+    // Cap to the frame rate
+    capFrameRate();
   }
 }
