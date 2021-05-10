@@ -30,6 +30,9 @@ public:
   // Number of units correspondent to 1 meter
   static const int unitsPerScore = 3000;
 
+  // Units between starting position and the first obstacle
+  static const int startingSlack = 10000;
+
   //////// Forward Movement
 
   // Starting speed in which player moves ahead
@@ -186,7 +189,7 @@ private:
   float speedUpTimer{ speedUpRate };
 
   // When player reaches this Z position, it's time to generate a new obstacle
-  int nextObstacleZ{ ObstacleGenerator::averageObstacleSpacing };
+  int nextObstacleZ{ startingSlack };
 
   //////////////////////// CONSTANT STATE
 
