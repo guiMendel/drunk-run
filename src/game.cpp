@@ -167,6 +167,18 @@ void Game::speedUp() {
   }
 }
 
+// Caps frame times to maintain the frame rate cap
+void Game::capFrameRate() {
+  // Minimum time the frame should take
+  float minimumTime = 1.0 / frameRate;
+
+  // How ahead this frame is of the minimum, in miliseconds
+  Uint32 msAhead = std::max(minimumTime - frameTime, (float)0.0) * 1000.0;
+
+  // If necessary, wait until the minimum time has elapsed
+  if (msAhead > 0) SDL_Delay(msAhead);
+}
+
 void Game::handleObstacles() {
   // Verify if player has advanced enough for game to generate more obstacles
   while (nextObstacleZ <= playerProgress) {
@@ -240,5 +252,8 @@ void Game::startGame() {
 
     // Render the game screen frame
     sdl.renderFrame(playerScore());
+
+    // Cap to the frame rate
+    capFrameRate();
   }
 }

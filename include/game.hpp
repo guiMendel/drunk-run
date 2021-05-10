@@ -21,6 +21,9 @@ public:
 
   //////// General
 
+  // Defines the maximum frames per second
+  static const int frameRate = 30;
+
   // Space the player has to move around
   static const int sideWalkWidth = 2400;
 
@@ -96,6 +99,9 @@ private:
 
   // Generates obstacles from player's position until his relative DoV
   void generateInitialObstacles();
+
+  // Caps frame time to maintain the frame rate cap
+  void capFrameRate();
 
   //////////////////////// HELPERS
 
