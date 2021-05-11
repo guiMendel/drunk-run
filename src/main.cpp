@@ -1,6 +1,6 @@
 #include "../include/game.hpp"
 
-int main(int argc, char* args[]) {
+int main([[maybe_unused]] int argc, [[maybe_unused]] char* args[]) {
   Game game;
 
   game.startGame();
